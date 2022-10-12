@@ -5,6 +5,12 @@ local M           = {}
 
 local config = require('minimap.config').get_config()
 
+local hl_namespace = vim.api.nvim_create_namespace("CodewindowHighlight")
+local underline_namespace = vim.api.nvim_create_namespace("CodewindowUnderline")
+local diagnostic_namespace = vim.api.nvim_create_namespace("CodewindowDiagnostic")
+
+vim.api.nvim_set_hl(0, "CodewindowCursor", { reverse = true, blend = 100 })
+
 local function most_commons(highlight) local count_table = {}
 
   for _, v in ipairs(highlight) do
@@ -114,19 +120,19 @@ function M.apply_highlight(highlights, buffer)
     for x = 1, #highlights[y] do
       for _, group in ipairs(highlights[y][x]) do
         local highlight_group = groups[group] or 'Normal';
-        vim.highlight.range(buffer, 1, highlight_group, { y - 1, (x - 1) * 3 + 6 }, { y - 1, x * 3 + 6 }, {})
+        vim.api.nvim_buf_add_highlight(buffer, hl_namespace, highlight_group, y - 1, (x - 1) * 3 + 6, x * 3 + 6)
       end
     end
   end
 
   for y = 1, #highlights do
-    vim.highlight.range(buffer, 3, "DiagnosticSignError", { y - 1, 0 }, { y - 1, 2 }, { inclusive = true })
-    vim.highlight.range(buffer, 3, "DiagnosticSignWarn", { y - 1, 3 }, { y - 1, 5 }, { inclusive = true })
+    vim.api.nvim_buf_add_highlight(buffer, diagnostic_namespace, "DiagnosticSignError", y - 1, 0, 3)
+    vim.api.nvim_buf_add_highlight(buffer, diagnostic_namespace, "DiagnosticSignWarn", y - 1, 3, 6)
   end
 end
 
 function M.display_screen_bounds(window)
-  vim.api.nvim_buf_clear_namespace(window.buffer, 2, 0, -1)
+  vim.api.nvim_buf_clear_namespace(window.buffer, underline_namespace, 0, -1)
 
   local topline = vim.fn.line('w0')
   local botline = vim.fn.line('w$')
@@ -136,9 +142,9 @@ function M.display_screen_bounds(window)
   local top_y = math.floor(topline / 4)
 
   if top_y > 0 then
-    vim.highlight.range(window.buffer, 2, "Underlined", { top_y - 1, 6 }, { top_y - 1, -1 }, {})
+    vim.api.nvim_buf_add_highlight(window.buffer, underline_namespace, "Underlined", top_y - 1, 6, -1)
   end
-  vim.highlight.range(window.buffer, 2, "Underlined", { top_y + difference, 6 }, { top_y + difference, -1 }, {})
+  vim.api.nvim_buf_add_highlight(window.buffer, underline_namespace, "Underlined", top_y + difference - 1, 6, -1)
 end
 
 return M

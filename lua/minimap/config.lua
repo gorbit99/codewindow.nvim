@@ -1,6 +1,6 @@
 local config = {
   minimap_width = 20,
-  width_multiplier = 5,
+  width_multiplier = 4,
 }
 
 local M = {}
