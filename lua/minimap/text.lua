@@ -1,5 +1,9 @@
 local utils = require('minimap.utils')
 local config = require('minimap.config').get_config()
+local inspect = require('inspect')
+
+local minimap_err = require('minimap.errors')
+local minimap_hl = require('minimap.highlight')
 
 local M = {}
 
@@ -10,10 +14,7 @@ end
 local function coord_to_flag(x, y)
   x = x - 1
   y = y - 1
-  if y % 4 < 3 then
-    return math.pow(2, y % 4) * (x % 2 == 0 and 1 or 8)
-  end
-  return x % 2 == 0 and 64 or 128
+  return math.pow(2, y % 4) * ((x % 2 == 0) and 1 or 16)
 end
 
 function M.compress_text(lines)
@@ -58,6 +59,30 @@ function M.compress_text(lines)
   end
 
   return minimap_text
+end
+
+function M.update_minimap(current_buffer, window)
+  vim.api.nvim_buf_set_option(window.buffer, 'modifiable', true)
+  local lines = vim.api.nvim_buf_get_lines(current_buffer, 0, -1, true)
+
+  local error_text = minimap_err.get_lsp_errors(current_buffer)
+  local minimap_text = M.compress_text(lines)
+
+  local text = {}
+  for i = 1, #minimap_text do
+    local line = error_text[i] .. minimap_text[i]
+    table.insert(text, line)
+  end
+
+  vim.api.nvim_buf_set_lines(window.buffer, 0, -1, true, text)
+
+  local highlights = minimap_hl.extract_highlighting(current_buffer, lines)
+  if highlights then
+    minimap_hl.apply_highlight(highlights, window.buffer)
+  end
+
+  minimap_hl.display_screen_bounds(window)
+  vim.api.nvim_buf_set_option(window.buffer, 'modifiable', false)
 end
 
 return M

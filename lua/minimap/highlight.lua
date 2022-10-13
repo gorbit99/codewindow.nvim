@@ -5,9 +5,15 @@ local M           = {}
 
 local config = require('minimap.config').get_config()
 
-local hl_namespace = vim.api.nvim_create_namespace("CodewindowHighlight")
-local underline_namespace = vim.api.nvim_create_namespace("CodewindowUnderline")
-local diagnostic_namespace = vim.api.nvim_create_namespace("CodewindowDiagnostic")
+local hl_namespace
+local underline_namespace
+local diagnostic_namespace
+
+local function create_hl_namespaces()
+  hl_namespace = vim.api.nvim_create_namespace("CodewindowHighlight")
+  underline_namespace = vim.api.nvim_create_namespace("CodewindowUnderline")
+  diagnostic_namespace = vim.api.nvim_create_namespace("CodewindowDiagnostic")
+end
 
 vim.api.nvim_set_hl(0, "CodewindowCursor", { reverse = true, blend = 100 })
 
@@ -38,6 +44,10 @@ end
 
 function M.extract_highlighting(buffer, lines)
   local buf_highlighter = highlighter.active[buffer]
+
+  if buf_highlighter == nil then
+    return
+  end
 
   local minimap_width = config.minimap_width
   local width_multiplier = config.width_multiplier
@@ -115,6 +125,7 @@ function M.extract_highlighting(buffer, lines)
 end
 
 function M.apply_highlight(highlights, buffer)
+  create_hl_namespaces()
   local groups = require('nvim-treesitter.highlight').default_map;
   for y = 1, #highlights do
     for x = 1, #highlights[y] do
@@ -134,8 +145,8 @@ end
 function M.display_screen_bounds(window)
   vim.api.nvim_buf_clear_namespace(window.buffer, underline_namespace, 0, -1)
 
-  local topline = vim.fn.line('w0')
-  local botline = vim.fn.line('w$')
+  local topline = utils.get_top_line(window.parent_win)
+  local botline = utils.get_bot_line(window.parent_win)
 
   local difference = math.ceil((botline - topline) / 4) + 1
 

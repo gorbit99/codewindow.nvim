@@ -2,7 +2,8 @@ local inspect = require "inspect"
 local utils   = require "minimap.utils"
 local M       = {}
 
-function M.get_lsp_errors(buffer, lines)
+function M.get_lsp_errors(buffer)
+  local lines = vim.api.nvim_buf_get_lines(buffer, 0, -1, true)
   local error_lines = {}
   for _ = 1, #lines do
     table.insert(error_lines, { warn = false, err = false })
