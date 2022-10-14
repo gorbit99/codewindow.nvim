@@ -143,6 +143,9 @@ function M.apply_highlight(highlights, buffer)
 end
 
 function M.display_screen_bounds(window)
+  if underline_namespace == nil then
+    return
+  end
   vim.api.nvim_buf_clear_namespace(window.buffer, underline_namespace, 0, -1)
 
   local topline = utils.get_top_line(window.parent_win)

@@ -106,7 +106,6 @@ function M.create_window(buffer, on_window_scroll)
 
   local current_window = vim.api.nvim_get_current_win()
   local window_height = vim.api.nvim_win_get_height(current_window)
-  local minimap_buf = vim.api.nvim_create_buf(false, true)
 
   if window_height <= 2 then
     return nil
@@ -121,6 +120,9 @@ function M.create_window(buffer, on_window_scroll)
     end
     window = nil
   end
+
+  local minimap_buf = vim.api.nvim_create_buf(false, true)
+  vim.api.nvim_buf_set_name(minimap_buf, "CodeWindow")
 
   local minimap_win = vim.api.nvim_open_win(minimap_buf, false, {
     relative = "win",
