@@ -1,6 +1,5 @@
-local inspect = require "inspect"
-local utils   = require "minimap.utils"
-local M       = {}
+local utils = require "minimap.utils"
+local M     = {}
 
 function M.get_lsp_errors(buffer)
   local lines = vim.api.nvim_buf_get_lines(buffer, 0, -1, true)
@@ -12,9 +11,13 @@ function M.get_lsp_errors(buffer)
   local errors = vim.diagnostic.get(buffer, { severity = { min = vim.diagnostic.severity.WARN } })
   for _, v in ipairs(errors) do
     if v.severity == vim.diagnostic.severity.WARN then
-      error_lines[v.lnum + 1].warn = true
+      if v.lnum + 1 <= #error_lines then
+        error_lines[v.lnum + 1].warn = true
+      end
     else
-      error_lines[v.lnum + 1].err = true
+      if v.lnum + 1 <= #error_lines then
+        error_lines[v.lnum + 1].err = true
+      end
     end
   end
 
@@ -23,7 +26,7 @@ function M.get_lsp_errors(buffer)
     local err_flag = 0
     local warn_flag = 0
 
-    local flags = { 1, 2, 4, 64 }
+    local flags = { 1, 2, 4, 8 }
 
     for di = 0, 3 do
       if error_lines[i + di] then

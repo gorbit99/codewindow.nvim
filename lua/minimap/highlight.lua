@@ -1,21 +1,18 @@
-local highlighter = require('vim.treesitter.highlighter')
-local ts_utils    = require('nvim-treesitter.ts_utils')
-local utils       = require('minimap.utils')
-local M           = {}
-
-local config = require('minimap.config').get_config()
+local utils = require('minimap.utils')
+local M     = {}
 
 local hl_namespace
 local underline_namespace
 local diagnostic_namespace
 
-local function create_hl_namespaces()
-  hl_namespace = vim.api.nvim_create_namespace("CodewindowHighlight")
-  underline_namespace = vim.api.nvim_create_namespace("CodewindowUnderline")
-  diagnostic_namespace = vim.api.nvim_create_namespace("CodewindowDiagnostic")
+local function create_hl_namespaces(buffer)
+  hl_namespace = vim.api.nvim_create_namespace("codewindow.highlight")
+  underline_namespace = vim.api.nvim_create_namespace("codewindow.underline")
+  diagnostic_namespace = vim.api.nvim_create_namespace("codewindow.diagnostic")
+  vim.api.nvim_buf_clear_namespace(buffer, hl_namespace, 0, -1)
+  vim.api.nvim_buf_clear_namespace(buffer, underline_namespace, 0, -1)
+  vim.api.nvim_buf_clear_namespace(buffer, diagnostic_namespace, 0, -1)
 end
-
-vim.api.nvim_set_hl(0, "CodewindowCursor", { reverse = true, blend = 100 })
 
 local function most_commons(highlight) local count_table = {}
 
@@ -43,6 +40,14 @@ local function most_commons(highlight) local count_table = {}
 end
 
 function M.extract_highlighting(buffer, lines)
+  local highlighter = require('vim.treesitter.highlighter')
+  local ts_utils    = require('nvim-treesitter.ts_utils')
+
+  if not vim.api.nvim_buf_is_valid(buffer) then
+    return
+  end
+  local config = require('minimap.config').get()
+
   local buf_highlighter = highlighter.active[buffer]
 
   if buf_highlighter == nil then
@@ -56,7 +61,7 @@ function M.extract_highlighting(buffer, lines)
   for _ = 1, #lines do
     local line = {}
     for _ = 1, minimap_width * width_multiplier * 2 do
-      table.insert(line, "")
+      table.insert(line, {})
     end
     table.insert(text_highlights, line)
   end
@@ -84,11 +89,9 @@ function M.extract_highlighting(buffer, lines)
           local start_row, start_col, end_row, end_col = ts_utils.get_vim_range({ ts_utils.get_node_range(node) },
             buffer)
 
-          for x = start_col, end_col do
-            for y = start_row, end_row do
-              if x <= #text_highlights[y] then
-                text_highlights[y][x] = c
-              end
+          for y = start_row, end_row do
+            for x = start_col, math.min(end_col, #text_highlights[y]) do
+              table.insert(text_highlights[y][x], c);
             end
           end
         end
@@ -110,7 +113,9 @@ function M.extract_highlighting(buffer, lines)
       if text_highlights[y][x] ~= '' then
         local minimap_x, minimap_y = utils.buf_to_minimap(x, y)
 
-        table.insert(highlights[minimap_y][minimap_x], text_highlights[y][x])
+        for _, v in ipairs(text_highlights[y][x]) do
+          table.insert(highlights[minimap_y][minimap_x], v)
+        end
       end
     end
   end
@@ -125,7 +130,8 @@ function M.extract_highlighting(buffer, lines)
 end
 
 function M.apply_highlight(highlights, buffer)
-  create_hl_namespaces()
+  create_hl_namespaces(buffer)
+
   local groups = require('nvim-treesitter.highlight').default_map;
   for y = 1, #highlights do
     for x = 1, #highlights[y] do
@@ -158,7 +164,18 @@ function M.display_screen_bounds(window)
   if top_y > 0 then
     vim.api.nvim_buf_add_highlight(window.buffer, underline_namespace, "Underlined", top_y - 1, 6, -1)
   end
-  vim.api.nvim_buf_add_highlight(window.buffer, underline_namespace, "Underlined", top_y + difference - 1, 6, -1)
+  local bot_y = top_y + difference - 1
+  local buf_height = vim.api.nvim_buf_line_count(window.buffer)
+  if bot_y > buf_height - 1 then
+    bot_y = buf_height - 1
+  end
+  if bot_y < 0 then
+    return
+  end
+  vim.api.nvim_buf_add_highlight(window.buffer, underline_namespace, "Underlined", bot_y, 6, -1)
+
+  local center = math.floor((top_y + bot_y) / 2) + 1
+  vim.api.nvim_win_set_cursor(window.window, { center, 0 })
 end
 
 return M

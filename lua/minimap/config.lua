@@ -1,18 +1,20 @@
+local M = {}
+
 local config = {
   minimap_width = 20,
   width_multiplier = 4,
+  use_lsp = true,
+  use_treesitter = true,
 }
 
-local M = {}
+function M.get()
+  return config
+end
 
 function M.setup(new_config)
   for k, v in pairs(new_config) do
     config[k] = v
   end
-end
-
-function M.get_config()
-  return config
 end
 
 return M
