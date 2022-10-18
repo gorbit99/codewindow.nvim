@@ -36,10 +36,11 @@ use {
 The setup method accepts an optional table as an argument with the following options (with the defaults):
 ```lua
 {
-  minimap_width = 20, --The width of the text part of the minimap
-  width_multiplier = 4, --How many characters one dot represents
+  minimap_width = 20, -- The width of the text part of the minimap
+  width_multiplier = 4, -- How many characters one dot represents
   use_lsp = true, -- Use the builtin LSP to show errors and warnings
   use_treesitter = true, -- Use nvim-treesitter to highlight the code
+  exclude_filetypes = {}, -- Choose certain filetypes to not show minimap on
 }
 ```
 
