@@ -1,7 +1,7 @@
 local M = {}
 
 function M.buf_to_minimap(x, y)
-  local config = require('minimap.config').get()
+  local config = require('codewindow.config').get()
   local minimap_x = math.floor((x - 1) / config.width_multiplier / 2) + 1
   local minimap_y = math.floor((y - 1) / 4) + 1
   return minimap_x, minimap_y

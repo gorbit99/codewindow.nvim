@@ -1,8 +1,8 @@
 local M = {}
 
-local minimap_hl  = require('minimap.highlight')
-local minimap_txt = require('minimap.text')
-local minimap_win = require('minimap.window')
+local minimap_hl  = require('codewindow.highlight')
+local minimap_txt = require('codewindow.text')
+local minimap_win = require('codewindow.window')
 
 function M.open_minimap()
   local current_buffer = vim.api.nvim_get_current_buf()
@@ -40,7 +40,7 @@ end
 
 function M.setup(config)
   if config ~= nil then
-    require('minimap.config').setup(config)
+    require('codewindow.config').setup(config)
   end
 end
 

@@ -1,11 +1,11 @@
 local M = {}
 
-local utils = require('minimap.utils')
+local utils = require('codewindow.utils')
 
-local minimap_txt = require('minimap.text')
+local minimap_txt = require('codewindow.text')
 local window = nil
 
-local minimap_hl = require('minimap.highlight')
+local minimap_hl = require('codewindow.highlight')
 
 local function center_minimap()
   local topline = utils.get_top_line(window.parent_win)
@@ -125,7 +125,7 @@ function M.create_window(buffer, on_window_scroll, on_switch_window)
     return nil
   end
 
-  local config = require('minimap.config').get()
+  local config = require('codewindow.config').get()
 
   if window then
     vim.api.nvim_win_set_config(window.window, {

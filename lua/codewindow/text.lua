@@ -1,7 +1,7 @@
-local utils = require('minimap.utils')
+local utils = require('codewindow.utils')
 
-local minimap_err = require('minimap.errors')
-local minimap_hl = require('minimap.highlight')
+local minimap_err = require('codewindow.errors')
+local minimap_hl = require('codewindow.highlight')
 
 local M = {}
 
@@ -16,7 +16,7 @@ local function coord_to_flag(x, y)
 end
 
 local function compress_text(lines)
-  local config = require('minimap.config').get()
+  local config = require('codewindow.config').get()
   local scanned_text = {}
   for _ = 0, math.floor(#lines / 4) do
     local line = {}
@@ -61,7 +61,7 @@ local function compress_text(lines)
 end
 
 function M.update_minimap(current_buffer, window)
-  local config = require('minimap.config').get()
+  local config = require('codewindow.config').get()
 
   vim.api.nvim_buf_set_option(window.buffer, 'modifiable', true)
   local lines = vim.api.nvim_buf_get_lines(current_buffer, 0, -1, true)

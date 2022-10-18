@@ -1,4 +1,4 @@
-local utils = require('minimap.utils')
+local utils = require('codewindow.utils')
 local M     = {}
 
 local hl_namespace
@@ -46,7 +46,7 @@ function M.extract_highlighting(buffer, lines)
   if not vim.api.nvim_buf_is_valid(buffer) then
     return
   end
-  local config = require('minimap.config').get()
+  local config = require('codewindow.config').get()
 
   local buf_highlighter = highlighter.active[buffer]
 

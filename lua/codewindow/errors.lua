@@ -1,4 +1,4 @@
-local utils = require "minimap.utils"
+local utils = require 'codewindow.utils'
 local M     = {}
 
 function M.get_lsp_errors(buffer)
