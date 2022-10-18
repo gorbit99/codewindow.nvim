@@ -15,7 +15,7 @@ The minimap updates every time you leave insert mode, change the text in normal 
 
 You can also focus the minimap, this lets you quickly move through the code to get to a specific point.
 
-[^1] Because one character in the minimap represents several in the actual buffer, it will show the highlights that occured the most in that region.
+[^1]: Because one character in the minimap represents several in the actual buffer, it will show the highlights that occured the most in that region.
 
 ## Installation
 
