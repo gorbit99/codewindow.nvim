@@ -61,6 +61,12 @@ codewindow.toggle_minimap()
 codewindow.toggle_focus()
 ```
 
+## Working alongside other plugins
+
+I'll try to make sure, that most plugins can be made to work without any issues alongside codewindow. If you find a usecase that should be supported, but can't be, then open an issue detailing the plugin used and the issue at hand.
+
+For the most part most plugins can simply be made to work by making them ignore the Codewindow filetype.
+
 ## Performance
 
 I tested the performance on the `lua/codewindow/highlight.lua` file in the repository, which was at the time of testing 181 lines long. Updating the minimap took 13ms on average.

@@ -164,7 +164,8 @@ function M.create_window(buffer, on_window_scroll, on_switch_window)
     vim.api.nvim_win_set_config(window.window, get_window_config(current_window))
   else
     local minimap_buf = vim.api.nvim_create_buf(false, true)
-    vim.api.nvim_buf_set_name(minimap_buf, "CodeWindow")
+    vim.api.nvim_buf_set_name(minimap_buf, 'CodeWindow')
+    vim.api.nvim_buf_set_option(minimap_buf, 'filetype', 'Codewindow')
 
     local minimap_win = vim.api.nvim_open_win(minimap_buf, false, get_window_config(current_window))
 
