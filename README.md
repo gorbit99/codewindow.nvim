@@ -47,15 +47,17 @@ The setup method accepts an optional table as an argument with the following opt
 
 The default keybindings are as follows:
 ```
-<leader>mm - open the minimap
+<leader>mo - open the minimap
 <leader>mc - close the minimap
 <leader>mf - focus/unfocus the minimap
+<leader>mm - toggle the minimap
 ```
 
 To create your own keybindings, you can use the functions:
 ```lua
 codewindow.open_minimap()
 codewindow.close_minimap()
+codewindow.toggle_minimap()
 codewindow.toggle_focus()
 ```
 
@@ -70,7 +72,6 @@ I tested the performance on the `lua/codewindow/highlight.lua` file in the repos
 
 ## TODO
 
-- Toggle function - this is an oversight I'm too tired to fix right now, but shouldn't take long
 - Help pages for the functions
 - Faster updates - theoretically only the lines that were edited need updating
 - Git support - I have a free column on the right reserved for it
