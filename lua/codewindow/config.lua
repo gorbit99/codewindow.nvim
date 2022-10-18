@@ -5,6 +5,7 @@ local config = {
   width_multiplier = 4,
   use_lsp = true,
   use_treesitter = true,
+  exclude_filetypes = {},
 }
 
 function M.get()

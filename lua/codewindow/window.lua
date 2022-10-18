@@ -113,51 +113,60 @@ local function setup_minimap_autocmds(on_window_scroll, parent_buf, on_switch_wi
   })
 end
 
+local function get_window_config(current_window)
+  local window_height = vim.api.nvim_win_get_height(current_window)
+  local config = require('codewindow.config').get()
+  return {
+    relative = "win",
+    win = current_window,
+    anchor = "NE",
+    width = config.minimap_width + 3,
+    height = window_height - 2,
+    row = 0,
+    col = vim.api.nvim_win_get_width(current_window),
+    focusable = false,
+    zindex = 2,
+    style = 'minimal',
+    border = 'single',
+  }
+end
+
 function M.create_window(buffer, on_window_scroll, on_switch_window)
+  local config = require('codewindow.config').get()
+  local filetype = vim.bo.filetype
+  for _, v in ipairs(config.exclude_filetypes) do
+    if v == filetype then
+      if window == nil then
+        return nil
+      else
+        if vim.api.nvim_win_is_valid(window.parent_win) then
+          vim.api.nvim_win_set_config(window.window, get_window_config(window.parent_win))
+          return nil
+        else
+          M.close_minimap()
+        end
+      end
+    end
+  end
+
   if window and vim.api.nvim_get_current_buf() == window.buffer then
     return nil
   end
 
   local current_window = vim.api.nvim_get_current_win()
-  local window_height = vim.api.nvim_win_get_height(current_window)
 
+  local window_height = vim.api.nvim_win_get_height(current_window)
   if window_height <= 2 then
     return nil
   end
 
-  local config = require('codewindow.config').get()
-
   if window then
-    vim.api.nvim_win_set_config(window.window, {
-      relative = "win",
-      win = current_window,
-      anchor = "NE",
-      width = config.minimap_width + 3,
-      height = window_height - 2,
-      row = 0,
-      col = vim.api.nvim_win_get_width(current_window),
-      focusable = false,
-      zindex = 2,
-      style = 'minimal',
-      border = 'single',
-    })
+    vim.api.nvim_win_set_config(window.window, get_window_config(current_window))
   else
     local minimap_buf = vim.api.nvim_create_buf(false, true)
     vim.api.nvim_buf_set_name(minimap_buf, "CodeWindow")
 
-    local minimap_win = vim.api.nvim_open_win(minimap_buf, false, {
-      relative = "win",
-      win = current_window,
-      anchor = "NE",
-      width = config.minimap_width + 3,
-      height = window_height - 2,
-      row = 0,
-      col = vim.api.nvim_win_get_width(current_window),
-      focusable = false,
-      zindex = 1,
-      style = 'minimal',
-      border = 'single',
-    })
+    local minimap_win = vim.api.nvim_open_win(minimap_buf, false, get_window_config(current_window))
 
     vim.api.nvim_win_set_option(minimap_win, 'winhl',
       'Normal:Normal,VertSplit:CodewindowBorder')
