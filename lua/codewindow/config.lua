@@ -6,6 +6,7 @@ local config = {
   use_lsp = true,
   use_treesitter = true,
   exclude_filetypes = {},
+  z_index = 1,
 }
 
 function M.get()

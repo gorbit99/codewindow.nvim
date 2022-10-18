@@ -41,6 +41,7 @@ The setup method accepts an optional table as an argument with the following opt
   use_lsp = true, -- Use the builtin LSP to show errors and warnings
   use_treesitter = true, -- Use nvim-treesitter to highlight the code
   exclude_filetypes = {}, -- Choose certain filetypes to not show minimap on
+  z_index = 1, -- The z-index the floating window will be on
 }
 ```
 

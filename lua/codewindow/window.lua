@@ -125,7 +125,7 @@ local function get_window_config(current_window)
     row = 0,
     col = vim.api.nvim_win_get_width(current_window),
     focusable = false,
-    zindex = 2,
+    zindex = config.z_index,
     style = 'minimal',
     border = 'single',
   }
