@@ -132,12 +132,10 @@ end
 function M.apply_highlight(highlights, buffer)
   create_hl_namespaces(buffer)
 
-  local groups = require('nvim-treesitter.highlight').default_map;
   for y = 1, #highlights do
     for x = 1, #highlights[y] do
       for _, group in ipairs(highlights[y][x]) do
-        local highlight_group = groups[group] or 'Normal';
-        vim.api.nvim_buf_add_highlight(buffer, hl_namespace, highlight_group, y - 1, (x - 1) * 3 + 6, x * 3 + 6)
+        vim.api.nvim_buf_add_highlight(buffer, hl_namespace, '@' .. group, y - 1, (x - 1) * 3 + 6, x * 3 + 6)
       end
     end
   end
