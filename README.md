@@ -47,9 +47,10 @@ The setup method accepts an optional table as an argument with the following opt
 
 The default keybindings are as follows:
 ```
-<leader>mm - open the minimap
+<leader>mo - open the minimap
 <leader>mc - close the minimap
 <leader>mf - focus/unfocus the minimap
+<leader>mm - toggle the minimap
 ```
 
 To create your own keybindings, you can use the functions:

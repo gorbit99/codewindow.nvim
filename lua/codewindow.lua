@@ -32,10 +32,19 @@ function M.toggle_focus()
   end
 end
 
+function M.toggle_minimap()
+  if minimap_win.is_minimap_open() then
+    M.close_minimap()
+  else
+    M.open_minimap()
+  end
+end
+
 function M.apply_default_keybinds()
-  vim.keymap.set('n', '<leader>mm', M.open_minimap)
+  vim.keymap.set('n', '<leader>mo', M.open_minimap)
   vim.keymap.set('n', '<leader>mf', M.toggle_focus)
   vim.keymap.set('n', '<leader>mc', M.close_minimap)
+  vim.keymap.set('n', '<leader>mm', M.toggle_minimap)
 end
 
 function M.setup(config)
