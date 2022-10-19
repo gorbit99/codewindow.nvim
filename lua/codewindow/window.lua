@@ -113,15 +113,23 @@ local function setup_minimap_autocmds(on_window_scroll, parent_buf, on_switch_wi
   })
 end
 
+local function get_window_height(current_window)
+  local window_height = vim.fn.winheight(current_window)
+  return window_height
+end
+
 local function get_window_config(current_window)
-  local window_height = vim.api.nvim_win_get_height(current_window)
   local config = require('codewindow.config').get()
+  local minimap_height = get_window_height(current_window)
+  if config.max_minimap_height then
+    minimap_height = math.min(minimap_height, config.max_minimap_height)
+  end
   return {
     relative = "win",
     win = current_window,
     anchor = "NE",
     width = config.minimap_width + 3,
-    height = window_height - 2,
+    height = minimap_height - 2,
     row = 0,
     col = vim.api.nvim_win_get_width(current_window),
     focusable = false,
@@ -155,7 +163,7 @@ function M.create_window(buffer, on_window_scroll, on_switch_window)
 
   local current_window = vim.api.nvim_get_current_win()
 
-  local window_height = vim.api.nvim_win_get_height(current_window)
+  local window_height = get_window_height(current_window)
   if window_height <= 2 then
     return nil
   end

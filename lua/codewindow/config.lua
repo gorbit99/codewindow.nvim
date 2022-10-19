@@ -7,6 +7,7 @@ local config = {
   use_treesitter = true,
   exclude_filetypes = {},
   z_index = 1,
+  max_minimap_height = nil,
 }
 
 function M.get()
