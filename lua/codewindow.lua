@@ -1,6 +1,5 @@
 local M = {}
 
-local minimap_hl  = require('codewindow.highlight')
 local minimap_txt = require('codewindow.text')
 local minimap_win = require('codewindow.window')
 
@@ -8,8 +7,6 @@ function M.open_minimap()
   local current_buffer = vim.api.nvim_get_current_buf()
   local window
   window = minimap_win.create_window(current_buffer, function()
-    minimap_hl.display_screen_bounds(window)
-  end, function()
     M.open_minimap()
   end)
 

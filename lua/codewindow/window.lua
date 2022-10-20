@@ -50,13 +50,13 @@ function M.close_minimap()
   window = nil
 end
 
-local function setup_minimap_autocmds(on_window_scroll, parent_buf, on_switch_window)
+local function setup_minimap_autocmds(parent_buf, on_switch_window)
   augroup = vim.api.nvim_create_augroup('CodewindowAugroup', {})
   vim.api.nvim_create_autocmd({ 'WinScrolled' }, {
     buffer = parent_buf,
     callback = function()
       center_minimap()
-      on_window_scroll(window)
+      minimap_hl.display_screen_bounds(window)
     end,
     group = augroup,
   })
@@ -107,7 +107,7 @@ local function setup_minimap_autocmds(on_window_scroll, parent_buf, on_switch_wi
       if args.buf == window.buffer then
         return
       end
-      vim.defer_fn(on_switch_window, 0)
+      on_switch_window()
     end,
     group = augroup
   })
@@ -139,7 +139,7 @@ local function get_window_config(current_window)
   }
 end
 
-function M.create_window(buffer, on_window_scroll, on_switch_window)
+function M.create_window(buffer, on_switch_window)
   local config = require('codewindow.config').get()
   local filetype = vim.bo.filetype
   for _, v in ipairs(config.exclude_filetypes) do
@@ -170,6 +170,9 @@ function M.create_window(buffer, on_window_scroll, on_switch_window)
 
   if window then
     vim.api.nvim_win_set_config(window.window, get_window_config(current_window))
+
+    window.parent_win = current_window
+    window.focused = false
   else
     local minimap_buf = vim.api.nvim_create_buf(false, true)
     vim.api.nvim_buf_set_name(minimap_buf, 'CodeWindow')
@@ -186,11 +189,10 @@ function M.create_window(buffer, on_window_scroll, on_switch_window)
       parent_win = vim.api.nvim_get_current_win(),
       focused = false,
     }
-
   end
 
   vim.api.nvim_clear_autocmds({ group = augroup })
-  setup_minimap_autocmds(on_window_scroll, buffer, on_switch_window)
+  setup_minimap_autocmds(buffer, on_switch_window)
 
   return window
 end
