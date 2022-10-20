@@ -50,6 +50,32 @@ function M.close_minimap()
   window = nil
 end
 
+local function get_window_height(current_window)
+  local window_height = vim.fn.winheight(current_window)
+  return window_height
+end
+
+local function get_window_config(current_window)
+  local config = require('codewindow.config').get()
+  local minimap_height = get_window_height(current_window)
+  if config.max_minimap_height then
+    minimap_height = math.min(minimap_height, config.max_minimap_height)
+  end
+  return {
+    relative = "win",
+    win = current_window,
+    anchor = "NE",
+    width = config.minimap_width + 3,
+    height = minimap_height - 2,
+    row = 0,
+    col = vim.api.nvim_win_get_width(current_window),
+    focusable = false,
+    zindex = config.z_index,
+    style = 'minimal',
+    border = 'single',
+  }
+end
+
 local function setup_minimap_autocmds(parent_buf, on_switch_window)
   augroup = vim.api.nvim_create_augroup('CodewindowAugroup', {})
   vim.api.nvim_create_autocmd({ 'WinScrolled' }, {
@@ -57,6 +83,7 @@ local function setup_minimap_autocmds(parent_buf, on_switch_window)
     callback = function()
       center_minimap()
       minimap_hl.display_screen_bounds(window)
+      vim.api.nvim_win_set_config(window.window, get_window_config(window.parent_win))
     end,
     group = augroup,
   })
@@ -111,32 +138,6 @@ local function setup_minimap_autocmds(parent_buf, on_switch_window)
     end,
     group = augroup
   })
-end
-
-local function get_window_height(current_window)
-  local window_height = vim.fn.winheight(current_window)
-  return window_height
-end
-
-local function get_window_config(current_window)
-  local config = require('codewindow.config').get()
-  local minimap_height = get_window_height(current_window)
-  if config.max_minimap_height then
-    minimap_height = math.min(minimap_height, config.max_minimap_height)
-  end
-  return {
-    relative = "win",
-    win = current_window,
-    anchor = "NE",
-    width = config.minimap_width + 3,
-    height = minimap_height - 2,
-    row = 0,
-    col = vim.api.nvim_win_get_width(current_window),
-    focusable = false,
-    zindex = config.z_index,
-    style = 'minimal',
-    border = 'single',
-  }
 end
 
 function M.create_window(buffer, on_switch_window)
