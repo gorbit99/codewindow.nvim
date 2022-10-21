@@ -54,7 +54,7 @@ function M.setup(config)
       if type(config.auto_enable) == 'boolean' then
         should_open = config.auto_enable
       else
-        for _, v in config.auto_enable do
+        for _, v in ipairs(config.auto_enable) do
           if v == filetype then
             should_open = true
           end
