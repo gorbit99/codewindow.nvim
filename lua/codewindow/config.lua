@@ -4,6 +4,7 @@ local config = {
   active_in_terminals = false,
   auto_enable = false,
   exclude_filetypes = {},
+  max_lines = nil,
   max_minimap_height = nil,
   minimap_width = 20,
   use_lsp = true,
