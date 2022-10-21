@@ -140,20 +140,35 @@ local function setup_minimap_autocmds(parent_buf, on_switch_window)
   })
 end
 
-function M.create_window(buffer, on_switch_window)
+local function should_ignore(current_window)
   local config = require('codewindow.config').get()
+
+  local win_info = vim.fn.getwininfo(current_window)
+  if not config.active_in_terminals and win_info[1].terminal == 1 then
+    return true
+  end
+
   local filetype = vim.bo.filetype
   for _, v in ipairs(config.exclude_filetypes) do
     if v == filetype then
-      if window == nil then
+      return true
+    end
+  end
+  return false
+end
+
+function M.create_window(buffer, on_switch_window)
+  local current_window = vim.api.nvim_get_current_win()
+
+  if should_ignore(current_window) then
+    if window == nil then
+      return nil
+    else
+      if vim.api.nvim_win_is_valid(window.parent_win) then
+        vim.api.nvim_win_set_config(window.window, get_window_config(window.parent_win))
         return nil
       else
-        if vim.api.nvim_win_is_valid(window.parent_win) then
-          vim.api.nvim_win_set_config(window.window, get_window_config(window.parent_win))
-          return nil
-        else
-          M.close_minimap()
-        end
+        M.close_minimap()
       end
     end
   end
@@ -161,8 +176,6 @@ function M.create_window(buffer, on_switch_window)
   if window and vim.api.nvim_get_current_buf() == window.buffer then
     return nil
   end
-
-  local current_window = vim.api.nvim_get_current_win()
 
   local window_height = get_window_height(current_window)
   if window_height <= 2 then

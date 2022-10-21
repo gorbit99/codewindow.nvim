@@ -8,6 +8,7 @@ local config = {
   exclude_filetypes = {},
   z_index = 1,
   max_minimap_height = nil,
+  active_in_terminals = false,
 }
 
 function M.get()

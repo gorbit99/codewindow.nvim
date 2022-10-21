@@ -7,7 +7,7 @@ function M.open_minimap()
   local current_buffer = vim.api.nvim_get_current_buf()
   local window
   window = minimap_win.create_window(current_buffer, function()
-    M.open_minimap()
+    vim.defer_fn(M.open_minimap, 0)
   end)
 
   if window == nil then
