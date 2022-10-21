@@ -61,6 +61,12 @@ function M.setup(config)
         end
       end
 
+      if config.max_lines then
+        if vim.api.nvim_buf_line_count(vim.api.nvim_get_current_buf()) > config.max_lines then
+          should_open = false
+        end
+      end
+
       if should_open then
         vim.defer_fn(M.open_minimap, 0)
       end
