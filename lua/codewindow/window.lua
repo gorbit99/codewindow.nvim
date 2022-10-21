@@ -1,5 +1,4 @@
 local M = {}
-
 local utils = require('codewindow.utils')
 
 local minimap_txt = require('codewindow.text')
@@ -46,7 +45,9 @@ local augroup
 
 function M.close_minimap()
   vim.api.nvim_buf_delete(window.buffer, { force = true });
-  vim.api.nvim_clear_autocmds({ group = augroup })
+  if augroup then
+    vim.api.nvim_clear_autocmds({ group = augroup })
+  end
   window = nil
 end
 
@@ -205,7 +206,9 @@ function M.create_window(buffer, on_switch_window)
     }
   end
 
-  vim.api.nvim_clear_autocmds({ group = augroup })
+  if augroup then
+    vim.api.nvim_clear_autocmds({ group = augroup })
+  end
   setup_minimap_autocmds(buffer, on_switch_window)
 
   return window

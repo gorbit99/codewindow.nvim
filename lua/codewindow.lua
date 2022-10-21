@@ -45,9 +45,27 @@ function M.apply_default_keybinds()
 end
 
 function M.setup(config)
-  if config ~= nil then
-    require('codewindow.config').setup(config)
-  end
+  config = require('codewindow.config').setup(config)
+
+  vim.api.nvim_create_autocmd({ 'BufEnter', 'WinEnter' }, {
+    callback = function()
+      local filetype = vim.bo.filetype
+      local should_open = false
+      if type(config.auto_enable) == 'boolean' then
+        should_open = config.auto_enable
+      else
+        for _, v in config.auto_enable do
+          if v == filetype then
+            should_open = true
+          end
+        end
+      end
+
+      if should_open then
+        vim.defer_fn(M.open_minimap, 0)
+      end
+    end
+  })
 end
 
 return M

@@ -1,14 +1,15 @@
 local M = {}
 
 local config = {
+  active_in_terminals = false,
+  auto_enable = false,
+  exclude_filetypes = {},
+  max_minimap_height = nil,
   minimap_width = 20,
-  width_multiplier = 4,
   use_lsp = true,
   use_treesitter = true,
-  exclude_filetypes = {},
+  width_multiplier = 4,
   z_index = 1,
-  max_minimap_height = nil,
-  active_in_terminals = false,
 }
 
 function M.get()
@@ -16,9 +17,13 @@ function M.get()
 end
 
 function M.setup(new_config)
+  if new_config == nil then
+    return config
+  end
   for k, v in pairs(new_config) do
     config[k] = v
   end
+  return config
 end
 
 return M
