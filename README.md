@@ -43,8 +43,10 @@ The setup method accepts an optional table as an argument with the following opt
   exclude_filetypes = {}, -- Choose certain filetypes to not show minimap on
   z_index = 1, -- The z-index the floating window will be on
   max_minimap_height = nil, -- The maximum height the minimap can take (including borders)
+  active_in_terminals = false, -- Should the minimap activate for terminal buffers
 }
 ```
+config changes get merged in with defaults, so defining every config option is unnecessary (and probably error prone).
 
 The default keybindings are as follows:
 ```
