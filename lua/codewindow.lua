@@ -66,6 +66,10 @@ function M.setup(config)
       end
     end
   })
+
+  if config.keybindings then
+    M.apply_default_keybinds()
+  end
 end
 
 return M
