@@ -14,23 +14,16 @@ local function create_hl_namespaces(buffer)
   vim.api.nvim_buf_clear_namespace(buffer, diagnostic_namespace, 0, -1)
 end
 
-local function most_commons(highlight) local count_table = {}
-
-  for _, v in ipairs(highlight) do
-    if not count_table[v] then
-      count_table[v] = 0
-    end
-    count_table[v] = count_table[v] + 1
-  end
+local function most_commons(highlight)
   local max = 0
-  for _, count in pairs(count_table) do
+  for _, count in pairs(highlight) do
     if count > max then
       max = count
     end
   end
 
   local result = {}
-  for entry, count in pairs(count_table) do
+  for entry, count in pairs(highlight) do
     if count == max then
       table.insert(result, entry)
     end
@@ -54,16 +47,19 @@ function M.extract_highlighting(buffer, lines)
     return
   end
 
+  local line_count = #lines
   local minimap_width = config.minimap_width
+  local minimap_height = math.ceil(line_count / 4)
   local width_multiplier = config.width_multiplier
+  local minimap_char_width = minimap_width * width_multiplier * 2
 
-  local text_highlights = {}
-  for _ = 1, #lines do
+  local highlights = {}
+  for _ = 1, minimap_height do
     local line = {}
-    for _ = 1, minimap_width * width_multiplier * 2 do
+    for _ = 1, minimap_width do
       table.insert(line, {})
     end
-    table.insert(text_highlights, line)
+    table.insert(highlights, line)
   end
 
   buf_highlighter.tree:for_each_tree(function(tstree, tree)
@@ -79,7 +75,7 @@ function M.extract_highlighting(buffer, lines)
       return
     end
 
-    local iter = query:query():iter_captures(root, buf_highlighter.bufnr, 0, #lines + 1)
+    local iter = query:query():iter_captures(root, buf_highlighter.bufnr, 0, line_count + 1)
 
     for capture, node, _ in iter do
       local hl = query.hl_cache[capture]
@@ -90,8 +86,9 @@ function M.extract_highlighting(buffer, lines)
             buffer)
 
           for y = start_row, end_row do
-            for x = start_col, math.min(end_col, #text_highlights[y]) do
-              table.insert(text_highlights[y][x], c);
+            for x = start_col, math.min(end_col, minimap_char_width) do
+              local minimap_x, minimap_y = utils.buf_to_minimap(x, y)
+              highlights[minimap_y][minimap_x][c] = (highlights[minimap_y][minimap_x][c] or 0) + 1
             end
           end
         end
@@ -99,29 +96,8 @@ function M.extract_highlighting(buffer, lines)
     end
   end, true)
 
-  local highlights = {}
-  for _ = 1, math.floor(#lines / 4) + 1 do
-    local line = {}
-    for _ = 1, minimap_width do
-      table.insert(line, {})
-    end
-    table.insert(highlights, line)
-  end
-
-  for y = 1, #text_highlights do
-    for x = 1, #text_highlights[y] do
-      if text_highlights[y][x] ~= '' then
-        local minimap_x, minimap_y = utils.buf_to_minimap(x, y)
-
-        for _, v in ipairs(text_highlights[y][x]) do
-          table.insert(highlights[minimap_y][minimap_x], v)
-        end
-      end
-    end
-  end
-
-  for y = 1, #highlights do
-    for x = 1, #highlights[y] do
+  for y = 1, minimap_height do
+    for x = 1, minimap_width do
       highlights[y][x] = most_commons(highlights[y][x])
     end
   end
@@ -129,18 +105,42 @@ function M.extract_highlighting(buffer, lines)
   return highlights
 end
 
+local function contains_group(cell, group)
+  for i, v in ipairs(cell) do
+    if v == group then
+      return i
+    end
+  end
+  return nil
+end
+
 function M.apply_highlight(highlights, buffer)
   create_hl_namespaces(buffer)
 
-  for y = 1, #highlights do
-    for x = 1, #highlights[y] do
+  local minimap_height = #highlights
+  local minimap_width = #highlights[1]
+
+  for y = 1, minimap_height do
+    for x = 1, minimap_width do
       for _, group in ipairs(highlights[y][x]) do
-        vim.api.nvim_buf_add_highlight(buffer, hl_namespace, '@' .. group, y - 1, (x - 1) * 3 + 6, x * 3 + 6)
+        if group ~= '' then
+          local end_x = x
+          while end_x < minimap_width do
+            local pos = contains_group(highlights[y][end_x + 1], group)
+            if not pos then
+              break
+            end
+            end_x = end_x + 1
+            highlights[y][x][pos] = ''
+          end
+          vim.api.nvim_buf_add_highlight(buffer, hl_namespace, '@' .. group, y - 1, (x - 1) * 3 + 6,
+            end_x * 3 + 6)
+        end
       end
     end
   end
 
-  for y = 1, #highlights do
+  for y = 1, minimap_height do
     vim.api.nvim_buf_add_highlight(buffer, diagnostic_namespace, "DiagnosticSignError", y - 1, 0, 3)
     vim.api.nvim_buf_add_highlight(buffer, diagnostic_namespace, "DiagnosticSignWarn", y - 1, 3, 6)
   end
