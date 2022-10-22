@@ -86,12 +86,8 @@ function M.update_minimap(current_buffer, window)
 
   vim.api.nvim_buf_set_lines(window.buffer, 0, -1, true, text)
 
-  if config.use_treesitter then
-    local highlights = minimap_hl.extract_highlighting(current_buffer, lines)
-    if highlights then
-      minimap_hl.apply_highlight(highlights, window.buffer)
-    end
-  end
+  local highlights = minimap_hl.extract_highlighting(current_buffer, lines)
+  minimap_hl.apply_highlight(highlights, window.buffer, lines)
 
   minimap_hl.display_screen_bounds(window)
   vim.api.nvim_buf_set_option(window.buffer, 'modifiable', false)

@@ -33,13 +33,18 @@ local function most_commons(highlight)
 end
 
 function M.extract_highlighting(buffer, lines)
+  local config = require('codewindow.config').get()
+
+  if not config.use_treesitter then
+    return nil
+  end
+
   local highlighter = require('vim.treesitter.highlighter')
   local ts_utils    = require('nvim-treesitter.ts_utils')
 
   if not vim.api.nvim_buf_is_valid(buffer) then
     return
   end
-  local config = require('codewindow.config').get()
 
   local buf_highlighter = highlighter.active[buffer]
 
@@ -114,27 +119,31 @@ local function contains_group(cell, group)
   return nil
 end
 
-function M.apply_highlight(highlights, buffer)
+function M.apply_highlight(highlights, buffer, lines)
+  local config = require('codewindow.config').get()
+  local minimap_height = math.ceil(#lines / 4)
+  local minimap_width = config.minimap_width
+
   create_hl_namespaces(buffer)
 
-  local minimap_height = #highlights
-  local minimap_width = #highlights[1]
+  if highlights ~= nil then
 
-  for y = 1, minimap_height do
-    for x = 1, minimap_width do
-      for _, group in ipairs(highlights[y][x]) do
-        if group ~= '' then
-          local end_x = x
-          while end_x < minimap_width do
-            local pos = contains_group(highlights[y][end_x + 1], group)
-            if not pos then
-              break
+    for y = 1, minimap_height do
+      for x = 1, minimap_width do
+        for _, group in ipairs(highlights[y][x]) do
+          if group ~= '' then
+            local end_x = x
+            while end_x < minimap_width do
+              local pos = contains_group(highlights[y][end_x + 1], group)
+              if not pos then
+                break
+              end
+              end_x = end_x + 1
+              highlights[y][x][pos] = ''
             end
-            end_x = end_x + 1
-            highlights[y][x][pos] = ''
+            vim.api.nvim_buf_add_highlight(buffer, hl_namespace, '@' .. group, y - 1, (x - 1) * 3 + 6,
+              end_x * 3 + 6)
           end
-          vim.api.nvim_buf_add_highlight(buffer, hl_namespace, '@' .. group, y - 1, (x - 1) * 3 + 6,
-            end_x * 3 + 6)
         end
       end
     end
