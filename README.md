@@ -74,7 +74,7 @@ For the most part most plugins can simply be made to work by making them ignore 
 
 ## Performance
 
-I tested the performance on the `lua/codewindow/highlight.lua` file in the repository, which was at the time of testing 181 lines long. Updating the minimap took 13ms on average.
+I tested the performance on the `lua/codewindow/highlight.lua` file in the repository, which was at the time of testing 179 lines long. Updating the minimap took 7.7ms on average.
 
 ## Related projects
 
