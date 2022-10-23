@@ -82,9 +82,11 @@ local function setup_minimap_autocmds(parent_buf, on_switch_window, on_cursor_mo
   vim.api.nvim_create_autocmd({ 'WinScrolled' }, {
     buffer = parent_buf,
     callback = function()
-      center_minimap()
-      minimap_hl.display_screen_bounds(window)
-      vim.api.nvim_win_set_config(window.window, get_window_config(window.parent_win))
+      vim.defer_fn(function()
+        center_minimap()
+        minimap_hl.display_screen_bounds(window)
+        vim.api.nvim_win_set_config(window.window, get_window_config(window.parent_win))
+      end, 0)
     end,
     group = augroup,
   })
