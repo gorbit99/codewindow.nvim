@@ -2,7 +2,7 @@
 
 Codewindow.nvim is a minimap plugin for neovim, that is closely integrated with treesitter and the builtin LSP to display more information to the user.
 
-![Codewindow in action](https://imgur.com/a/31MFsGD)
+![Codewindow in action](https://i.imgur.com/MokAFG0.png)
 
 ## How it works
 
