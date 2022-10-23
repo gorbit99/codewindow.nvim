@@ -11,6 +11,7 @@ local config = {
   use_treesitter = true,
   width_multiplier = 4,
   z_index = 1,
+  show_cursor = true,
 }
 
 function M.get()

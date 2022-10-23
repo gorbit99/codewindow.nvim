@@ -4,11 +4,13 @@ local M     = {}
 local hl_namespace
 local underline_namespace
 local diagnostic_namespace
+local cursor_namespace
 
 local function create_hl_namespaces(buffer)
   hl_namespace = vim.api.nvim_create_namespace("codewindow.highlight")
   underline_namespace = vim.api.nvim_create_namespace("codewindow.underline")
   diagnostic_namespace = vim.api.nvim_create_namespace("codewindow.diagnostic")
+  cursor_namespace = vim.api.nvim_create_namespace("codewindow.cursor")
   vim.api.nvim_buf_clear_namespace(buffer, hl_namespace, 0, -1)
   vim.api.nvim_buf_clear_namespace(buffer, underline_namespace, 0, -1)
   vim.api.nvim_buf_clear_namespace(buffer, diagnostic_namespace, 0, -1)
@@ -183,6 +185,24 @@ function M.display_screen_bounds(window)
 
   local center = math.floor((top_y + bot_y) / 2) + 1
   vim.api.nvim_win_set_cursor(window.window, { center, 0 })
+end
+
+function M.display_cursor(window)
+  local config = require('codewindow.config').get()
+
+  if not config.show_cursor then
+    return
+  end
+
+  vim.api.nvim_buf_clear_namespace(window.buffer, cursor_namespace, 0, -1)
+  local cursor = vim.api.nvim_win_get_cursor(window.parent_win)
+
+  local minimap_x, minimap_y = utils.buf_to_minimap(cursor[2] + 1, cursor[1])
+
+  minimap_x = minimap_x + 2 - 1
+  minimap_y = minimap_y - 1
+
+  vim.api.nvim_buf_add_highlight(window.buffer, cursor_namespace, "Cursor", minimap_y, minimap_x * 3, minimap_x * 3 + 3)
 end
 
 return M

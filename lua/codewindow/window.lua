@@ -77,7 +77,7 @@ local function get_window_config(current_window)
   }
 end
 
-local function setup_minimap_autocmds(parent_buf, on_switch_window)
+local function setup_minimap_autocmds(parent_buf, on_switch_window, on_cursor_move)
   augroup = vim.api.nvim_create_augroup('CodewindowAugroup', {})
   vim.api.nvim_create_autocmd({ 'WinScrolled' }, {
     buffer = parent_buf,
@@ -139,6 +139,11 @@ local function setup_minimap_autocmds(parent_buf, on_switch_window)
     end,
     group = augroup
   })
+  vim.api.nvim_create_autocmd({ 'CursorMoved' }, {
+    callback = function()
+      on_cursor_move()
+    end
+  })
 end
 
 local function should_ignore(current_window)
@@ -158,7 +163,7 @@ local function should_ignore(current_window)
   return false
 end
 
-function M.create_window(buffer, on_switch_window)
+function M.create_window(buffer, on_switch_window, on_cursor_move)
   local current_window = vim.api.nvim_get_current_win()
 
   if should_ignore(current_window) then
@@ -209,7 +214,7 @@ function M.create_window(buffer, on_switch_window)
   if augroup then
     vim.api.nvim_clear_autocmds({ group = augroup })
   end
-  setup_minimap_autocmds(buffer, on_switch_window)
+  setup_minimap_autocmds(buffer, on_switch_window, on_cursor_move)
 
   return window
 end

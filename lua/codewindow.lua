@@ -2,12 +2,15 @@ local M = {}
 
 local minimap_txt = require('codewindow.text')
 local minimap_win = require('codewindow.window')
+local minimap_hl  = require('codewindow.highlight')
 
 function M.open_minimap()
   local current_buffer = vim.api.nvim_get_current_buf()
   local window
   window = minimap_win.create_window(current_buffer, function()
     vim.defer_fn(M.open_minimap, 0)
+  end, function()
+    minimap_hl.display_cursor(window)
   end)
 
   if window == nil then

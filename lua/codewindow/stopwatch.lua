@@ -39,4 +39,16 @@ function M.print(name)
   end
 end
 
+function M.clear(name)
+  if name then
+    if not stopwatches[name] then
+      return
+    end
+    stopwatches[name] = nil
+    return
+  end
+
+  stopwatches = {}
+end
+
 return M

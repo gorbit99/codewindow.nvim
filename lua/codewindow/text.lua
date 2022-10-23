@@ -89,6 +89,10 @@ function M.update_minimap(current_buffer, window)
   local highlights = minimap_hl.extract_highlighting(current_buffer, lines)
   minimap_hl.apply_highlight(highlights, window.buffer, lines)
 
+  if config.show_cursor then
+    minimap_hl.display_cursor(window)
+  end
+
   minimap_hl.display_screen_bounds(window)
   vim.api.nvim_buf_set_option(window.buffer, 'modifiable', false)
 end
