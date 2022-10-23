@@ -46,6 +46,7 @@ The setup method accepts an optional table as an argument with the following opt
   use_treesitter = true, -- Use nvim-treesitter to highlight the code
   width_multiplier = 4, -- How many characters one dot represents
   z_index = 1, -- The z-index the floating window will be on
+  show_cursor = true, -- Show the cursor position in the minimap
 }
 ```
 config changes get merged in with defaults, so defining every config option is unnecessary (and probably error prone).
