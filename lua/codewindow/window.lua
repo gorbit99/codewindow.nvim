@@ -142,7 +142,8 @@ local function setup_minimap_autocmds(parent_buf, on_switch_window, on_cursor_mo
   vim.api.nvim_create_autocmd({ 'CursorMoved' }, {
     callback = function()
       on_cursor_move()
-    end
+    end,
+    group = augroup
   })
 end
 
