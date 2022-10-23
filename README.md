@@ -75,6 +75,9 @@ CodewindowBorder -- the border highlight
 CodewindowBackground -- the background highlight
 CodewindowWarn -- the color of the warning dots
 CodewindowError -- the color of the error dots
+
+-- Example
+vim.api.nvim_set_hl(0, 'CodewindowBorder', {fg = '#ffff00'})
 ```
 
 ## Working alongside other plugins
