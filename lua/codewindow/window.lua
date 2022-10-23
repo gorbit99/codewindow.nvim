@@ -115,6 +115,9 @@ local function setup_minimap_autocmds(parent_buf, on_switch_window, on_cursor_mo
     buffer = window.buffer,
     callback = function()
       vim.defer_fn(function()
+        if not window then
+          return
+        end
         local new_buffer = vim.api.nvim_get_current_buf()
         vim.api.nvim_win_set_buf(window.window, window.buffer)
         vim.api.nvim_win_set_buf(window.parent_win, new_buffer)
@@ -146,6 +149,13 @@ local function setup_minimap_autocmds(parent_buf, on_switch_window, on_cursor_mo
       on_cursor_move()
     end,
     group = augroup
+  })
+  vim.api.nvim_create_autocmd({ 'VimLeavePre' }, {
+    callback = function()
+      if window then
+        M.close_minimap()
+      end
+    end
   })
 end
 
