@@ -47,6 +47,7 @@ The setup method accepts an optional table as an argument with the following opt
   width_multiplier = 4, -- How many characters one dot represents
   z_index = 1, -- The z-index the floating window will be on
   show_cursor = true, -- Show the cursor position in the minimap
+  window_border = 'single' -- The border style of the floating window (accepts all usual options)
 }
 ```
 config changes get merged in with defaults, so defining every config option is unnecessary (and probably error prone).
@@ -65,6 +66,15 @@ codewindow.open_minimap()
 codewindow.close_minimap()
 codewindow.toggle_minimap()
 codewindow.toggle_focus()
+```
+
+To change how the minimap looks, you can define the following highlight groups 
+somewhere in your config:
+```lua
+CodewindowBorder -- the border highlight
+CodewindowBackground -- the background highlight
+CodewindowWarn -- the color of the warning dots
+CodewindowError -- the color of the error dots
 ```
 
 ## Working alongside other plugins

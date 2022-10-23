@@ -73,7 +73,7 @@ local function get_window_config(current_window)
     focusable = false,
     zindex = config.z_index,
     style = 'minimal',
-    border = 'single',
+    border = config.window_border,
   }
 end
 
@@ -204,7 +204,7 @@ function M.create_window(buffer, on_switch_window, on_cursor_move)
     local minimap_win = vim.api.nvim_open_win(minimap_buf, false, get_window_config(current_window))
 
     vim.api.nvim_win_set_option(minimap_win, 'winhl',
-      'Normal:Normal,VertSplit:CodewindowBorder')
+      'Normal:CodewindowBackground,VertSplit:CodewindowBorder')
 
     window = {
       buffer = minimap_buf,

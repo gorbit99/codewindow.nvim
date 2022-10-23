@@ -12,6 +12,7 @@ local config = {
   width_multiplier = 4,
   z_index = 1,
   show_cursor = true,
+  window_border = 'single'
 }
 
 function M.get()

@@ -52,6 +52,8 @@ end
 function M.setup(config)
   config = require('codewindow.config').setup(config)
 
+  minimap_hl.setup()
+
   vim.api.nvim_create_autocmd({ 'BufEnter', 'WinEnter' }, {
     callback = function()
       local filetype = vim.bo.filetype

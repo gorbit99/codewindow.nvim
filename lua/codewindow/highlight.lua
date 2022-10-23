@@ -6,11 +6,19 @@ local underline_namespace
 local diagnostic_namespace
 local cursor_namespace
 
+function M.setup()
+  hl_namespace = vim.api.nvim_create_namespace('codewindow.highlight')
+  underline_namespace = vim.api.nvim_create_namespace('codewindow.underline')
+  diagnostic_namespace = vim.api.nvim_create_namespace('codewindow.diagnostic')
+  cursor_namespace = vim.api.nvim_create_namespace('codewindow.cursor')
+
+  vim.api.nvim_set_hl(0, 'CodewindowBackground', { link = 'Normal', default = true })
+  vim.api.nvim_set_hl(0, 'CodewindowBorder', { fg = "#ffffff", default = true })
+  vim.api.nvim_set_hl(0, 'CodewindowWarn', { link = 'DiagnosticSignWarn', default = true })
+  vim.api.nvim_set_hl(0, 'CodewindowError', { link = 'DiagnosticSignError', default = true })
+end
+
 local function create_hl_namespaces(buffer)
-  hl_namespace = vim.api.nvim_create_namespace("codewindow.highlight")
-  underline_namespace = vim.api.nvim_create_namespace("codewindow.underline")
-  diagnostic_namespace = vim.api.nvim_create_namespace("codewindow.diagnostic")
-  cursor_namespace = vim.api.nvim_create_namespace("codewindow.cursor")
   vim.api.nvim_buf_clear_namespace(buffer, hl_namespace, 0, -1)
   vim.api.nvim_buf_clear_namespace(buffer, underline_namespace, 0, -1)
   vim.api.nvim_buf_clear_namespace(buffer, diagnostic_namespace, 0, -1)
@@ -152,8 +160,8 @@ function M.apply_highlight(highlights, buffer, lines)
   end
 
   for y = 1, minimap_height do
-    vim.api.nvim_buf_add_highlight(buffer, diagnostic_namespace, "DiagnosticSignError", y - 1, 0, 3)
-    vim.api.nvim_buf_add_highlight(buffer, diagnostic_namespace, "DiagnosticSignWarn", y - 1, 3, 6)
+    vim.api.nvim_buf_add_highlight(buffer, diagnostic_namespace, "CodewindowError", y - 1, 0, 3)
+    vim.api.nvim_buf_add_highlight(buffer, diagnostic_namespace, "CodewindowWarn", y - 1, 3, 6)
   end
 end
 
