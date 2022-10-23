@@ -10,7 +10,9 @@ function M.open_minimap()
   window = minimap_win.create_window(current_buffer, function()
     vim.defer_fn(M.open_minimap, 0)
   end, function()
-    minimap_hl.display_cursor(window)
+    vim.defer_fn(function()
+      minimap_hl.display_cursor(window)
+    end, 0)
   end)
 
   if window == nil then
