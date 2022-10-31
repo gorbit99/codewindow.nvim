@@ -66,7 +66,7 @@ local function get_window_config(current_window)
     relative = "win",
     win = current_window,
     anchor = "NE",
-    width = config.minimap_width + 3,
+    width = config.minimap_width + 4,
     height = minimap_height - 2,
     row = 0,
     col = vim.api.nvim_win_get_width(current_window),
@@ -90,7 +90,7 @@ local function setup_minimap_autocmds(parent_buf, on_switch_window, on_cursor_mo
     end,
     group = augroup,
   })
-  vim.api.nvim_create_autocmd({ 'TextChanged', 'InsertLeave', 'DiagnosticChanged' }, {
+  vim.api.nvim_create_autocmd({ 'TextChanged', 'InsertLeave', 'DiagnosticChanged', 'FileWritePost' }, {
     buffer = parent_buf,
     callback = function()
       vim.defer_fn(function()

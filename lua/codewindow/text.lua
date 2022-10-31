@@ -18,7 +18,7 @@ end
 local function compress_text(lines)
   local config = require('codewindow.config').get()
   local scanned_text = {}
-  for _ = 0, math.floor(#lines / 4) do
+  for _ = 1, math.ceil(#lines / 4) do
     local line = {}
     for _ = 1, config.minimap_width do
       table.insert(line, 0)
@@ -68,20 +68,28 @@ function M.update_minimap(current_buffer, window)
 
   local minimap_text = compress_text(lines)
 
-  local text = {}
-  if config.use_lsp then
-    local error_text = minimap_err.get_lsp_errors(current_buffer)
+  local placeholder_str = string.rep(utils.flag_to_char(0), 2)
 
-    for i = 1, #minimap_text do
-      local line = error_text[i] .. minimap_text[i]
-      table.insert(text, line)
-    end
+  local text = {}
+
+  local error_text
+  if config.use_lsp then
+    error_text = minimap_err.get_lsp_errors(current_buffer)
   else
-    local error_text = string.rep(utils.flag_to_char(0), 2)
-    for i = 1, #minimap_text do
-      local line = error_text .. minimap_text[i]
-      table.insert(text, line)
-    end
+    error_text = {}
+  end
+
+  local git_text
+  if config.use_git then
+    git_text = require('codewindow.git').parse_git_diff(lines)
+  else
+    git_text = {}
+  end
+  for i = 1, #minimap_text do
+    local line = (error_text[i] or placeholder_str)
+        .. minimap_text[i]
+        .. (git_text[i] or placeholder_str)
+    text[i] = line
   end
 
   vim.api.nvim_buf_set_lines(window.buffer, 0, -1, true, text)

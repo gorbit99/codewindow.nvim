@@ -9,6 +9,7 @@ local config = {
   minimap_width = 20,
   use_lsp = true,
   use_treesitter = true,
+  use_git = true,
   width_multiplier = 4,
   z_index = 1,
   show_cursor = true,

@@ -16,6 +16,8 @@ function M.setup()
   vim.api.nvim_set_hl(0, 'CodewindowBorder', { fg = "#ffffff", default = true })
   vim.api.nvim_set_hl(0, 'CodewindowWarn', { link = 'DiagnosticSignWarn', default = true })
   vim.api.nvim_set_hl(0, 'CodewindowError', { link = 'DiagnosticSignError', default = true })
+  vim.api.nvim_set_hl(0, 'CodewindowAddition', { fg = '#aadb56', default = true })
+  vim.api.nvim_set_hl(0, 'CodewindowDeletion', { fg = '#fc4c4c', default = true })
 end
 
 local function create_hl_namespaces(buffer)
@@ -162,10 +164,22 @@ function M.apply_highlight(highlights, buffer, lines)
   for y = 1, minimap_height do
     vim.api.nvim_buf_add_highlight(buffer, diagnostic_namespace, "CodewindowError", y - 1, 0, 3)
     vim.api.nvim_buf_add_highlight(buffer, diagnostic_namespace, "CodewindowWarn", y - 1, 3, 6)
+
+    local git_start = 6 + 3 * config.minimap_width
+    vim.highlight.range(buffer, diagnostic_namespace, "CodewindowAddition",
+      { y - 1, git_start },
+      { y - 1, git_start + 3 }
+      , {})
+    vim.highlight.range(buffer, diagnostic_namespace, "CodewindowDeletion",
+      { y - 1, git_start + 3 },
+      { y - 1, git_start + 6 }
+      , {})
   end
 end
 
 function M.display_screen_bounds(window)
+  local config = require('codewindow.config').get()
+
   if underline_namespace == nil then
     return
   end
@@ -179,7 +193,8 @@ function M.display_screen_bounds(window)
   local top_y = math.floor(topline / 4)
 
   if top_y > 0 then
-    vim.api.nvim_buf_add_highlight(window.buffer, underline_namespace, "Underlined", top_y - 1, 6, -1)
+    vim.api.nvim_buf_add_highlight(window.buffer, underline_namespace, "Underlined", top_y - 1, 6,
+      6 + config.minimap_width * 3)
   end
   local bot_y = top_y + difference - 1
   local buf_height = vim.api.nvim_buf_line_count(window.buffer)
@@ -189,7 +204,7 @@ function M.display_screen_bounds(window)
   if bot_y < 0 then
     return
   end
-  vim.api.nvim_buf_add_highlight(window.buffer, underline_namespace, "Underlined", bot_y, 6, -1)
+  vim.api.nvim_buf_add_highlight(window.buffer, underline_namespace, "Underlined", bot_y, 6, 6 + config.minimap_width * 3)
 
   local center = math.floor((top_y + bot_y) / 2) + 1
   vim.api.nvim_win_set_cursor(window.window, { center, 0 })
