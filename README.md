@@ -44,6 +44,7 @@ The setup method accepts an optional table as an argument with the following opt
   minimap_width = 20, -- The width of the text part of the minimap
   use_lsp = true, -- Use the builtin LSP to show errors and warnings
   use_treesitter = true, -- Use nvim-treesitter to highlight the code
+  use_git = true, -- Show small dots to indicate git additions and deletions
   width_multiplier = 4, -- How many characters one dot represents
   z_index = 1, -- The z-index the floating window will be on
   show_cursor = true, -- Show the cursor position in the minimap
@@ -75,6 +76,8 @@ CodewindowBorder -- the border highlight
 CodewindowBackground -- the background highlight
 CodewindowWarn -- the color of the warning dots
 CodewindowError -- the color of the error dots
+CodewindowAddition -- the color of the addition git sign
+CodewindowDeletion -- the color of the deletion git sign
 
 -- Example
 vim.api.nvim_set_hl(0, 'CodewindowBorder', {fg = '#ffff00'})
