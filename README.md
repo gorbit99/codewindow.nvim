@@ -78,6 +78,7 @@ CodewindowWarn -- the color of the warning dots
 CodewindowError -- the color of the error dots
 CodewindowAddition -- the color of the addition git sign
 CodewindowDeletion -- the color of the deletion git sign
+CodewindowUnderline -- the color of the underlines on the minimap
 
 -- Example
 vim.api.nvim_set_hl(0, 'CodewindowBorder', {fg = '#ffff00'})

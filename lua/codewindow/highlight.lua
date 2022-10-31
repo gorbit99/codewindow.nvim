@@ -18,6 +18,7 @@ function M.setup()
   vim.api.nvim_set_hl(0, 'CodewindowError', { link = 'DiagnosticSignError', default = true })
   vim.api.nvim_set_hl(0, 'CodewindowAddition', { fg = '#aadb56', default = true })
   vim.api.nvim_set_hl(0, 'CodewindowDeletion', { fg = '#fc4c4c', default = true })
+  vim.api.nvim_set_hl(0, 'CodewindowUnderline', { underline = true, sp = '#ffffff', default = true })
 end
 
 local function create_hl_namespaces(buffer)
@@ -193,7 +194,7 @@ function M.display_screen_bounds(window)
   local top_y = math.floor(topline / 4)
 
   if top_y > 0 then
-    vim.api.nvim_buf_add_highlight(window.buffer, underline_namespace, "Underlined", top_y - 1, 6,
+    vim.api.nvim_buf_add_highlight(window.buffer, underline_namespace, "CodewindowUnderline", top_y - 1, 6,
       6 + config.minimap_width * 3)
   end
   local bot_y = top_y + difference - 1
@@ -204,7 +205,8 @@ function M.display_screen_bounds(window)
   if bot_y < 0 then
     return
   end
-  vim.api.nvim_buf_add_highlight(window.buffer, underline_namespace, "Underlined", bot_y, 6, 6 + config.minimap_width * 3)
+  vim.api.nvim_buf_add_highlight(window.buffer, underline_namespace, "CodewindowUnderline", bot_y, 6,
+    6 + config.minimap_width * 3)
 
   local center = math.floor((top_y + bot_y) / 2) + 1
   vim.api.nvim_win_set_cursor(window.window, { center, 0 })
