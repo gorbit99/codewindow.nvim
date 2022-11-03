@@ -1,7 +1,7 @@
-local utils = require('codewindow.utils')
+local utils = require("codewindow.utils")
 
-local minimap_err = require('codewindow.errors')
-local minimap_hl = require('codewindow.highlight')
+local minimap_err = require("codewindow.errors")
+local minimap_hl = require("codewindow.highlight")
 
 local M = {}
 
@@ -16,7 +16,7 @@ local function coord_to_flag(x, y)
 end
 
 local function compress_text(lines)
-  local config = require('codewindow.config').get()
+  local config = require("codewindow.config").get()
   local scanned_text = {}
   for _ = 1, math.ceil(#lines / 4) do
     local line = {}
@@ -29,7 +29,6 @@ local function compress_text(lines)
   for y = 1, #lines do
     local current_line = lines[y]
     for x = 1, config.minimap_width * 2 do
-
       local any_printable = false
       for dx = 1, config.width_multiplier do
         local actual_x = (x - 1) * config.width_multiplier + (dx - 1) + 1
@@ -61,9 +60,9 @@ local function compress_text(lines)
 end
 
 function M.update_minimap(current_buffer, window)
-  local config = require('codewindow.config').get()
+  local config = require("codewindow.config").get()
 
-  vim.api.nvim_buf_set_option(window.buffer, 'modifiable', true)
+  vim.api.nvim_buf_set_option(window.buffer, "modifiable", true)
   local lines = vim.api.nvim_buf_get_lines(current_buffer, 0, -1, true)
 
   local minimap_text = compress_text(lines)
@@ -81,28 +80,28 @@ function M.update_minimap(current_buffer, window)
 
   local git_text
   if config.use_git then
-    git_text = require('codewindow.git').parse_git_diff(lines)
+    git_text = require("codewindow.git").parse_git_diff(lines)
   else
     git_text = {}
   end
   for i = 1, #minimap_text do
     local line = (error_text[i] or placeholder_str)
-        .. minimap_text[i]
-        .. (git_text[i] or placeholder_str)
+      .. minimap_text[i]
+      .. (git_text[i] or placeholder_str)
     text[i] = line
   end
 
   vim.api.nvim_buf_set_lines(window.buffer, 0, -1, true, text)
 
-  local highlights = minimap_hl.extract_highlighting(current_buffer, lines)
-  minimap_hl.apply_highlight(highlights, window.buffer, lines)
-
-  if config.show_cursor then
-    minimap_hl.display_cursor(window)
-  end
-
-  minimap_hl.display_screen_bounds(window)
-  vim.api.nvim_buf_set_option(window.buffer, 'modifiable', false)
+  -- local highlights = minimap_hl.extract_highlighting(current_buffer, lines)
+  -- minimap_hl.apply_highlight(highlights, window.buffer, lines)
+  --
+  -- if config.show_cursor then
+  --   minimap_hl.display_cursor(window)
+  -- end
+  --
+  -- minimap_hl.display_screen_bounds(window)
+  vim.api.nvim_buf_set_option(window.buffer, "modifiable", false)
 end
 
 return M
