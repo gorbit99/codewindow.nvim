@@ -6,6 +6,8 @@ local window = nil
 
 local minimap_hl = require('codewindow.highlight')
 
+local config = require('codewindow.config').get()
+
 local function center_minimap()
   local topline = utils.get_top_line(window.parent_win)
   local botline = utils.get_bot_line(window.parent_win)
@@ -57,7 +59,6 @@ local function get_window_height(current_window)
 end
 
 local function get_window_config(current_window)
-  local config = require('codewindow.config').get()
   local minimap_height = get_window_height(current_window)
   if config.max_minimap_height then
     minimap_height = math.min(minimap_height, config.max_minimap_height)
@@ -99,18 +100,6 @@ local function setup_minimap_autocmds(parent_buf, on_switch_window, on_cursor_mo
     end,
     group = augroup,
   })
-  vim.api.nvim_create_autocmd({ 'CursorMoved' }, {
-    buffer = window.buffer,
-    callback = function()
-      local topline = utils.get_top_line(window.parent_win)
-      local botline = utils.get_bot_line(window.parent_win)
-      local center = math.floor((topline + botline) / 2 / 4)
-      local row = vim.api.nvim_win_get_cursor(window.window)[1] - 1
-      local diff = row - center
-      scroll_parent_window(diff * 4)
-    end,
-    group = augroup,
-  })
   vim.api.nvim_create_autocmd({ 'BufWinLeave' }, {
     buffer = window.buffer,
     callback = function()
@@ -144,12 +133,7 @@ local function setup_minimap_autocmds(parent_buf, on_switch_window, on_cursor_mo
     end,
     group = augroup
   })
-  vim.api.nvim_create_autocmd({ 'CursorMoved' }, {
-    callback = function()
-      on_cursor_move()
-    end,
-    group = augroup
-  })
+
   vim.api.nvim_create_autocmd({ 'VimLeavePre' }, {
     callback = function()
       if window then
@@ -157,10 +141,31 @@ local function setup_minimap_autocmds(parent_buf, on_switch_window, on_cursor_mo
       end
     end
   })
+
+  -- only render when `show_cursor` is on
+  if config.show_cursor then
+    vim.api.nvim_create_autocmd({ 'CursorMoved' }, {
+      buffer = window.buffer,
+      callback = function()
+        local topline = utils.get_top_line(window.parent_win)
+        local botline = utils.get_bot_line(window.parent_win)
+        local center = math.floor((topline + botline) / 2 / 4)
+        local row = vim.api.nvim_win_get_cursor(window.window)[1] - 1
+        local diff = row - center
+        scroll_parent_window(diff * 4)
+      end,
+      group = augroup,
+    })
+    vim.api.nvim_create_autocmd({ 'CursorMoved' }, {
+      callback = function()
+        on_cursor_move()
+      end,
+      group = augroup
+    })
+  end
 end
 
 local function should_ignore(current_window)
-  local config = require('codewindow.config').get()
 
   local win_info = vim.fn.getwininfo(current_window)
   if not config.active_in_terminals and win_info[1].terminal == 1 then
