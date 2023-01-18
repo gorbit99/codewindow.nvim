@@ -6,7 +6,7 @@ Codewindow.nvim is a minimap plugin for neovim, that is closely integrated with 
 
 ## How it works
 
-Opening the minimap creates a floating window that will follow the active window around, always staying on the right, filling the entire height of said window. In this floating window.
+Opening the minimap creates a floating window that will follow the active window around, always staying on the right, filling the entire height of said window.
 
 In this floating window you can see the text rendered out using braille characters. Unless disabled, it will also try to get the treesitter highlights from the active buffer and apply them to the minimap[^1]. If the builtin LSP reports an error
 or a warning, it will also appear as a small red or yellow dot next to the line the issue is in. The current viewport is shown as 2 white lines around the block of code being observed.
