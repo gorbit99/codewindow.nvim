@@ -91,7 +91,7 @@ local function setup_minimap_autocmds(parent_buf, on_switch_window, on_cursor_mo
     end,
     group = augroup,
   })
-  vim.api.nvim_create_autocmd({ 'TextChanged', 'InsertLeave', 'DiagnosticChanged', 'FileWritePost' }, {
+  vim.api.nvim_create_autocmd(config.events, {
     buffer = parent_buf,
     callback = function()
       vim.defer_fn(function()
