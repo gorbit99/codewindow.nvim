@@ -1,5 +1,9 @@
-local utils = require("codewindow.utils")
 local M = {}
+
+local config = require("codewindow.config").get()
+local utils = require("codewindow.utils")
+local highlighter
+local ts_utils
 
 local hl_namespace
 local underline_namespace
@@ -48,16 +52,7 @@ local function most_commons(highlight)
   return result
 end
 
-function M.extract_highlighting(buffer, lines)
-  local config = require("codewindow.config").get()
-
-  if not config.use_treesitter then
-    return nil
-  end
-
-  local highlighter = require("vim.treesitter.highlighter")
-  local ts_utils = require("nvim-treesitter.ts_utils")
-
+local function extract_highlighting(buffer, lines)
   if not api.nvim_buf_is_valid(buffer) then
     return
   end
@@ -126,6 +121,14 @@ function M.extract_highlighting(buffer, lines)
   return highlights
 end
 
+if config.use_treesitter then
+  highlighter = require("vim.treesitter.highlighter")
+  ts_utils = require("nvim-treesitter.ts_utils")
+  M.extract_highlighting = extract_highlighting
+else
+  M.extract_highlighting = function() end
+end
+
 local function contains_group(cell, group)
   for i, v in ipairs(cell) do
     if v == group then
@@ -136,7 +139,6 @@ local function contains_group(cell, group)
 end
 
 function M.apply_highlight(highlights, buffer, lines)
-  local config = require("codewindow.config").get()
   local minimap_height = math.ceil(#lines / 4)
   local minimap_width = config.minimap_width
 
@@ -188,8 +190,6 @@ function M.apply_highlight(highlights, buffer, lines)
 end
 
 function M.display_screen_bounds(window)
-  local config = require("codewindow.config").get()
-
   if underline_namespace == nil then
     return
   end
@@ -234,8 +234,6 @@ function M.display_screen_bounds(window)
 end
 
 function M.display_cursor(window)
-  local config = require("codewindow.config").get()
-
   if not config.show_cursor then
     return
   end
