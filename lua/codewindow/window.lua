@@ -37,13 +37,16 @@ local function center_minimap()
 end
 
 local function display_screen_bounds()
-	local ok = pcall(minimap_hl.display_screen_bounds, window)
-	if not ok then
-      vim.defer_fn(function()
-        minimap_txt.update_minimap(vim.api.nvim_win_get_buf(window.parent_win), window)
-		  minimap_hl.display_screen_bounds(window)
-      end, 0)
-	end
+  local ok = pcall(minimap_hl.display_screen_bounds, window)
+  if not ok then
+    vim.defer_fn(function()
+      minimap_txt.update_minimap(
+        vim.api.nvim_win_get_buf(window.parent_win), 
+        window
+      )
+      minimap_hl.display_screen_bounds(window)
+    end, 0)
+  end
 end
 
 local function scroll_parent_window(amount)
