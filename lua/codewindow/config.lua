@@ -13,7 +13,8 @@ local config = {
   width_multiplier = 4,
   z_index = 1,
   show_cursor = true,
-  window_border = 'single'
+  window_border = 'single',
+  events = { 'TextChanged', 'InsertLeave', 'DiagnosticChanged', 'FileWritePost' }
 }
 
 function M.get()

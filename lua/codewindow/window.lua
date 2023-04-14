@@ -36,11 +36,24 @@ local function center_minimap()
   utils.scroll_window(window.window, diff)
 end
 
+local function display_screen_bounds()
+  local ok = pcall(minimap_hl.display_screen_bounds, window)
+  if not ok then
+    vim.defer_fn(function()
+      minimap_txt.update_minimap(
+        vim.api.nvim_win_get_buf(window.parent_win), 
+        window
+      )
+      minimap_hl.display_screen_bounds(window)
+    end, 0)
+  end
+end
+
 local function scroll_parent_window(amount)
   utils.scroll_window(window.parent_win, amount)
   center_minimap()
 
-  minimap_hl.display_screen_bounds(window)
+  display_screen_bounds()
 end
 
 local augroup
@@ -85,13 +98,13 @@ local function setup_minimap_autocmds(parent_buf, on_switch_window, on_cursor_mo
     callback = function()
       vim.defer_fn(function()
         center_minimap()
-        minimap_hl.display_screen_bounds(window)
+        display_screen_bounds()
         vim.api.nvim_win_set_config(window.window, get_window_config(window.parent_win))
       end, 0)
     end,
     group = augroup,
   })
-  vim.api.nvim_create_autocmd({ 'TextChanged', 'InsertLeave', 'DiagnosticChanged', 'FileWritePost' }, {
+  vim.api.nvim_create_autocmd(config.events, {
     buffer = parent_buf,
     callback = function()
       vim.defer_fn(function()
