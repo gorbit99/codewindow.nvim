@@ -1,9 +1,10 @@
+local M = {}
+
+local minimap_hl = require('codewindow.highlight')
+local minimap_err = require('codewindow.errors')
 local utils = require('codewindow.utils')
 
-local minimap_err = require('codewindow.errors')
-local minimap_hl = require('codewindow.highlight')
-
-local M = {}
+local api = vim.api
 
 local function is_whitespace(chr)
   return chr == " " or chr == "\t" or chr == ""
@@ -63,8 +64,8 @@ end
 function M.update_minimap(current_buffer, window)
   local config = require('codewindow.config').get()
 
-  vim.api.nvim_buf_set_option(window.buffer, 'modifiable', true)
-  local lines = vim.api.nvim_buf_get_lines(current_buffer, 0, -1, true)
+  api.nvim_buf_set_option(window.buffer, 'modifiable', true)
+  local lines = api.nvim_buf_get_lines(current_buffer, 0, -1, true)
 
   local minimap_text = compress_text(lines)
 
@@ -92,7 +93,7 @@ function M.update_minimap(current_buffer, window)
     text[i] = line
   end
 
-  vim.api.nvim_buf_set_lines(window.buffer, 0, -1, true, text)
+  api.nvim_buf_set_lines(window.buffer, 0, -1, true, text)
 
   local highlights = minimap_hl.extract_highlighting(current_buffer, lines)
   minimap_hl.apply_highlight(highlights, window.buffer, lines)
@@ -102,7 +103,7 @@ function M.update_minimap(current_buffer, window)
   end
 
   minimap_hl.display_screen_bounds(window)
-  vim.api.nvim_buf_set_option(window.buffer, 'modifiable', false)
+  api.nvim_buf_set_option(window.buffer, 'modifiable', false)
 end
 
 return M
