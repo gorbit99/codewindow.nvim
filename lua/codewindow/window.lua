@@ -1,12 +1,13 @@
 local M = {}
-local utils = require('codewindow.utils')
 
+local utils = require('codewindow.utils')
 local minimap_txt = require('codewindow.text')
+local minimap_hl = require('codewindow.highlight')
+local config = require('codewindow.config').get()
 local window = nil
 
-local minimap_hl = require('codewindow.highlight')
-
-local config = require('codewindow.config').get()
+local api = vim.api
+local defer = vim.defer_fn
 
 local function center_minimap()
   local topline = utils.get_top_line(window.parent_win)
@@ -39,9 +40,9 @@ end
 local function display_screen_bounds()
   local ok = pcall(minimap_hl.display_screen_bounds, window)
   if not ok then
-    vim.defer_fn(function()
+    defer(function()
       minimap_txt.update_minimap(
-        vim.api.nvim_win_get_buf(window.parent_win), 
+        api.nvim_win_get_buf(window.parent_win), 
         window
       )
       minimap_hl.display_screen_bounds(window)
@@ -59,9 +60,9 @@ end
 local augroup
 
 function M.close_minimap()
-  vim.api.nvim_buf_delete(window.buffer, { force = true });
+  api.nvim_buf_delete(window.buffer, { force = true });
   if augroup then
-    vim.api.nvim_clear_autocmds({ group = augroup })
+    api.nvim_clear_autocmds({ group = augroup })
   end
   window = nil
 end
@@ -83,7 +84,7 @@ local function get_window_config(current_window)
     width = config.minimap_width + 4,
     height = minimap_height - 2,
     row = 0,
-    col = vim.api.nvim_win_get_width(current_window),
+    col = api.nvim_win_get_width(current_window),
     focusable = false,
     zindex = config.z_index,
     style = 'minimal',
@@ -92,43 +93,43 @@ local function get_window_config(current_window)
 end
 
 local function setup_minimap_autocmds(parent_buf, on_switch_window, on_cursor_move)
-  augroup = vim.api.nvim_create_augroup('CodewindowAugroup', {})
-  vim.api.nvim_create_autocmd({ 'WinScrolled' }, {
+  augroup = api.nvim_create_augroup('CodewindowAugroup', {})
+  api.nvim_create_autocmd({ 'WinScrolled' }, {
     buffer = parent_buf,
     callback = function()
-      vim.defer_fn(function()
+      defer(function()
         center_minimap()
         display_screen_bounds()
-        vim.api.nvim_win_set_config(window.window, get_window_config(window.parent_win))
+        api.nvim_win_set_config(window.window, get_window_config(window.parent_win))
       end, 0)
     end,
     group = augroup,
   })
-  vim.api.nvim_create_autocmd(config.events, {
+  api.nvim_create_autocmd(config.events, {
     buffer = parent_buf,
     callback = function()
-      vim.defer_fn(function()
-        minimap_txt.update_minimap(vim.api.nvim_win_get_buf(window.parent_win), window)
+      defer(function()
+        minimap_txt.update_minimap(api.nvim_win_get_buf(window.parent_win), window)
       end, 0)
     end,
     group = augroup,
   })
-  vim.api.nvim_create_autocmd({ 'BufWinLeave' }, {
+  api.nvim_create_autocmd({ 'BufWinLeave' }, {
     buffer = window.buffer,
     callback = function()
-      vim.defer_fn(function()
+      defer(function()
         if not window then
           return
         end
-        local new_buffer = vim.api.nvim_get_current_buf()
-        vim.api.nvim_win_set_buf(window.window, window.buffer)
-        vim.api.nvim_win_set_buf(window.parent_win, new_buffer)
+        local new_buffer = api.nvim_get_current_buf()
+        api.nvim_win_set_buf(window.window, window.buffer)
+        api.nvim_win_set_buf(window.parent_win, new_buffer)
         M.toggle_focused()
       end, 0)
     end,
     group = augroup,
   })
-  vim.api.nvim_create_autocmd({ 'WinClosed' }, {
+  api.nvim_create_autocmd({ 'WinClosed' }, {
     buffer = window.buffer,
     callback = function()
       if window == nil then
@@ -137,7 +138,7 @@ local function setup_minimap_autocmds(parent_buf, on_switch_window, on_cursor_mo
       M.close_minimap()
     end
   })
-  vim.api.nvim_create_autocmd({ 'WinEnter', 'BufEnter' }, {
+  api.nvim_create_autocmd({ 'WinEnter', 'BufEnter' }, {
     callback = function(args)
       if args.buf == window.buffer then
         return
@@ -147,7 +148,7 @@ local function setup_minimap_autocmds(parent_buf, on_switch_window, on_cursor_mo
     group = augroup
   })
 
-  vim.api.nvim_create_autocmd({ 'VimLeavePre' }, {
+  api.nvim_create_autocmd({ 'VimLeavePre' }, {
     callback = function()
       if window then
         M.close_minimap()
@@ -157,19 +158,19 @@ local function setup_minimap_autocmds(parent_buf, on_switch_window, on_cursor_mo
 
   -- only render when `show_cursor` is on
   if config.show_cursor then
-    vim.api.nvim_create_autocmd({ 'CursorMoved' }, {
+    api.nvim_create_autocmd({ 'CursorMoved' }, {
       buffer = window.buffer,
       callback = function()
         local topline = utils.get_top_line(window.parent_win)
         local botline = utils.get_bot_line(window.parent_win)
         local center = math.floor((topline + botline) / 2 / 4)
-        local row = vim.api.nvim_win_get_cursor(window.window)[1] - 1
+        local row = api.nvim_win_get_cursor(window.window)[1] - 1
         local diff = row - center
         scroll_parent_window(diff * 4)
       end,
       group = augroup,
     })
-    vim.api.nvim_create_autocmd({ 'CursorMoved' }, {
+    api.nvim_create_autocmd({ 'CursorMoved' }, {
       callback = function()
         on_cursor_move()
       end,
@@ -195,14 +196,14 @@ local function should_ignore(current_window)
 end
 
 function M.create_window(buffer, on_switch_window, on_cursor_move)
-  local current_window = vim.api.nvim_get_current_win()
+  local current_window = api.nvim_get_current_win()
 
   if should_ignore(current_window) then
     if window == nil then
       return nil
     else
-      if vim.api.nvim_win_is_valid(window.parent_win) then
-        vim.api.nvim_win_set_config(window.window, get_window_config(window.parent_win))
+      if api.nvim_win_is_valid(window.parent_win) then
+        api.nvim_win_set_config(window.window, get_window_config(window.parent_win))
         return nil
       else
         M.close_minimap()
@@ -210,7 +211,7 @@ function M.create_window(buffer, on_switch_window, on_cursor_move)
     end
   end
 
-  if window and vim.api.nvim_get_current_buf() == window.buffer then
+  if window and api.nvim_get_current_buf() == window.buffer then
     return nil
   end
 
@@ -220,30 +221,30 @@ function M.create_window(buffer, on_switch_window, on_cursor_move)
   end
 
   if window then
-    vim.api.nvim_win_set_config(window.window, get_window_config(current_window))
+    api.nvim_win_set_config(window.window, get_window_config(current_window))
 
     window.parent_win = current_window
     window.focused = false
   else
-    local minimap_buf = vim.api.nvim_create_buf(false, true)
-    vim.api.nvim_buf_set_name(minimap_buf, 'CodeWindow')
-    vim.api.nvim_buf_set_option(minimap_buf, 'filetype', 'Codewindow')
+    local minimap_buf = api.nvim_create_buf(false, true)
+    api.nvim_buf_set_name(minimap_buf, 'CodeWindow')
+    api.nvim_buf_set_option(minimap_buf, 'filetype', 'Codewindow')
 
-    local minimap_win = vim.api.nvim_open_win(minimap_buf, false, get_window_config(current_window))
+    local minimap_win = api.nvim_open_win(minimap_buf, false, get_window_config(current_window))
 
-    vim.api.nvim_win_set_option(minimap_win, 'winhl',
+    api.nvim_win_set_option(minimap_win, 'winhl',
       'Normal:CodewindowBackground,FloatBorder:CodewindowBorder')
 
     window = {
       buffer = minimap_buf,
       window = minimap_win,
-      parent_win = vim.api.nvim_get_current_win(),
+      parent_win = api.nvim_get_current_win(),
       focused = false,
     }
   end
 
   if augroup then
-    vim.api.nvim_clear_autocmds({ group = augroup })
+    api.nvim_clear_autocmds({ group = augroup })
   end
   setup_minimap_autocmds(buffer, on_switch_window, on_cursor_move)
 
@@ -256,9 +257,9 @@ function M.set_focused(value)
   end
   window.focused = value
   if window.focused then
-    vim.api.nvim_set_current_win(window.window)
+    api.nvim_set_current_win(window.window)
   else
-    vim.api.nvim_set_current_win(window.parent_win)
+    api.nvim_set_current_win(window.parent_win)
   end
 end
 
@@ -275,7 +276,7 @@ function M.scroll_minimap(amount)
 end
 
 function M.scroll_minimap_by_page(amount)
-  local window_height = vim.api.nvim_win_get_height(window.parent_win)
+  local window_height = api.nvim_win_get_height(window.parent_win)
   local actual_amount = math.floor(window_height * amount);
   actual_amount = actual_amount + (4 - actual_amount % 4) % 4
   scroll_parent_window(actual_amount)

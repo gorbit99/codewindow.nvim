@@ -1,5 +1,8 @@
+local M = {}
+
 local utils = require 'codewindow.utils'
-local M     = {}
+
+local diagnostic = vim.diagnostic
 
 function M.get_lsp_errors(buffer)
   local lines = vim.api.nvim_buf_get_lines(buffer, 0, -1, true)
@@ -8,9 +11,9 @@ function M.get_lsp_errors(buffer)
     table.insert(error_lines, { warn = false, err = false })
   end
 
-  local errors = vim.diagnostic.get(buffer, { severity = { min = vim.diagnostic.severity.WARN } })
+  local errors = diagnostic.get(buffer, { severity = { min = diagnostic.severity.WARN } })
   for _, v in ipairs(errors) do
-    if v.severity == vim.diagnostic.severity.WARN then
+    if v.severity == diagnostic.severity.WARN then
       if v.lnum + 1 <= #error_lines then
         error_lines[v.lnum + 1].warn = true
       end

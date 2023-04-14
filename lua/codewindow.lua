@@ -4,13 +4,16 @@ local minimap_txt = require('codewindow.text')
 local minimap_win = require('codewindow.window')
 local minimap_hl  = require('codewindow.highlight')
 
+local defer = vim.defer_fn
+local api = vim.api
+
 function M.open_minimap()
-  local current_buffer = vim.api.nvim_get_current_buf()
+  local current_buffer = api.nvim_get_current_buf()
   local window
   window = minimap_win.create_window(current_buffer, function()
-    vim.defer_fn(M.open_minimap, 0)
+    defer(M.open_minimap, 0)
   end, function()
-    vim.defer_fn(function()
+    defer(function()
       minimap_hl.display_cursor(window)
     end, 0)
   end)
@@ -54,7 +57,7 @@ function M.setup(config)
 
   minimap_hl.setup()
 
-  vim.api.nvim_create_autocmd({ 'BufEnter', 'WinEnter' }, {
+  api.nvim_create_autocmd({ 'BufEnter', 'WinEnter' }, {
     callback = function()
       local filetype = vim.bo.filetype
       local should_open = false
@@ -69,13 +72,13 @@ function M.setup(config)
       end
 
       if config.max_lines then
-        if vim.api.nvim_buf_line_count(vim.api.nvim_get_current_buf()) > config.max_lines then
+        if api.nvim_buf_line_count(api.nvim_get_current_buf()) > config.max_lines then
           should_open = false
         end
       end
 
       if should_open then
-        vim.defer_fn(M.open_minimap, 0)
+        defer(M.open_minimap, 0)
       end
     end
   })

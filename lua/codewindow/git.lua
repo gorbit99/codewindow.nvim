@@ -1,9 +1,10 @@
 local M = {}
 
 local utils = require('codewindow.utils')
+local fn = vim.fn
 
 function M.parse_git_diff(lines)
-  local diff = vim.fn.systemlist({ 'git', 'diff', '-U0', vim.fn.expand('%') })
+  local diff = fn.systemlist({ 'git', 'diff', '-U0', fn.expand('%') })
 
   if vim.v.shell_error ~= 0 then
     return {}
