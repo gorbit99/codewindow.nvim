@@ -77,14 +77,21 @@ local function get_window_config(current_window)
   if config.max_minimap_height then
     minimap_height = math.min(minimap_height, config.max_minimap_height)
   end
+
+  local relative = config.relative
+  local is_relative = config.relative == "win"
+  local win = is_relative and current_window or nil
+  local col = is_relative and api.nvim_win_get_width(current_window) or vim.o.columns - 1
+  local row = (not is_relative and vim.o.showtabline > 0) and 1 or 0
+
   return {
-    relative = "win",
-    win = current_window,
+    relative = relative,
+    win = win,
     anchor = "NE",
     width = config.minimap_width + 4,
     height = minimap_height - 2,
-    row = 0,
-    col = api.nvim_win_get_width(current_window),
+    row = row,
+    col = col,
     focusable = false,
     zindex = config.z_index,
     style = 'minimal',
