@@ -14,6 +14,7 @@ local config = {
   z_index = 1,
   show_cursor = true,
   window_border = 'single',
+  relative = 'win',
   events = { 'TextChanged', 'InsertLeave', 'DiagnosticChanged', 'FileWritePost' }
 }
 

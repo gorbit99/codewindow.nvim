@@ -49,6 +49,7 @@ The setup method accepts an optional table as an argument with the following opt
   z_index = 1, -- The z-index the floating window will be on
   show_cursor = true, -- Show the cursor position in the minimap
   window_border = 'single' -- The border style of the floating window (accepts all usual options)
+  relative = "win" -- What will be the minimap be placed relative to, "win": the current window, "editor": the entire editor
   events = { 'TextChanged', 'InsertLeave', 'DiagnosticChanged', 'FileWritePost' } -- Events that update the code window
 }
 ```
