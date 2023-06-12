@@ -165,7 +165,7 @@ local function setup_minimap_autocmds(parent_buf, on_switch_window, on_cursor_mo
     group = augroup
   })
 
-  api.nvim_create_autocmd({ 'VimLeavePre' }, {
+  api.nvim_create_autocmd({ 'VimLeavePre', 'SessionLoadPost' }, {
     callback = function()
       if window then
         M.close_minimap()
