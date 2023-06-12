@@ -77,6 +77,10 @@ function M.setup(config)
         end
       end
 
+      if vim.bo.buftype == 'terminal' and not config.active_in_terminals then
+        return
+      end
+
       if should_open then
         defer(M.open_minimap)
       end
