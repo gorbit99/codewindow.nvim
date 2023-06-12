@@ -109,7 +109,9 @@ local function setup_minimap_autocmds(parent_buf, on_switch_window, on_cursor_mo
       defer(function()
         center_minimap()
         display_screen_bounds()
-        api.nvim_win_set_config(window.window, get_window_config(window.parent_win))
+        if api.nvim_win_is_valid(window.window) then
+          api.nvim_win_set_config(window.window, get_window_config(window.parent_win))
+        end
       end)
     end,
     group = augroup,
@@ -133,8 +135,12 @@ local function setup_minimap_autocmds(parent_buf, on_switch_window, on_cursor_mo
           return
         end
         local new_buffer = api.nvim_get_current_buf()
-        api.nvim_win_set_buf(window.window, window.buffer)
-        api.nvim_win_set_buf(window.parent_win, new_buffer)
+        if api.nvim_win_is_valid(window.window) then
+          api.nvim_win_set_buf(window.window, window.buffer)
+        end
+        if api.nvim_win_is_valid(window.parent_win) then
+          api.nvim_win_set_buf(window.parent_win, new_buffer)
+        end
         M.toggle_focused()
       end)
     end,
@@ -216,7 +222,9 @@ function M.create_window(buffer, on_switch_window, on_cursor_move)
     if window == nil then
       return nil
     else
-      if api.nvim_win_is_valid(window.parent_win) then
+      if api.nvim_win_is_valid(window.parent_win)
+        and api.nvim_win_is_valid(window.window)
+      then
         api.nvim_win_set_config(window.window, get_window_config(window.parent_win))
         return nil
       else
@@ -235,7 +243,9 @@ function M.create_window(buffer, on_switch_window, on_cursor_move)
   end
 
   if window then
-    api.nvim_win_set_config(window.window, get_window_config(current_window))
+    if api.nvim_win_is_valid(window.window) then
+      api.nvim_win_set_config(window.window, get_window_config(current_window))
+    end
 
     window.parent_win = current_window
     window.focused = false
