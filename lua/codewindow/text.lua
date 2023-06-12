@@ -62,6 +62,7 @@ local function compress_text(lines)
 end
 
 function M.update_minimap(current_buffer, window)
+  if not api.nvim_buf_is_valid(current_buffer or -1) then return end
   local config = require('codewindow.config').get()
 
   api.nvim_buf_set_option(window.buffer, 'modifiable', true)

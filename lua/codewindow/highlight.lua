@@ -230,7 +230,9 @@ function M.display_screen_bounds(window)
   )
 
   local center = math.floor((top_y + bot_y) / 2) + 1
-  api.nvim_win_set_cursor(window.window, { center, 0 })
+  if api.nvim_win_is_valid(window.window) then
+    api.nvim_win_set_cursor(window.window, { center, 0 })
+  end
 end
 
 function M.display_cursor(window)
@@ -238,7 +240,12 @@ function M.display_cursor(window)
     return
   end
 
-  api.nvim_buf_clear_namespace(window.buffer, cursor_namespace, 0, -1)
+  if api.nvim_buf_is_valid(window.buffer) then
+    api.nvim_buf_clear_namespace(window.buffer, cursor_namespace, 0, -1)
+  end
+  if not api.nvim_win_is_valid(window.parent_win) then
+    return
+  end
   local cursor = api.nvim_win_get_cursor(window.parent_win)
 
   local minimap_x, minimap_y = utils.buf_to_minimap(cursor[2] + 1, cursor[1])
@@ -246,7 +253,9 @@ function M.display_cursor(window)
   minimap_x = minimap_x + 2 - 1
   minimap_y = minimap_y - 1
 
-  api.nvim_buf_add_highlight(window.buffer, cursor_namespace, "Cursor", minimap_y, minimap_x * 3, minimap_x * 3 + 3)
+  if api.nvim_buf_is_valid(window.buffer) then
+    api.nvim_buf_add_highlight(window.buffer, cursor_namespace, "Cursor", minimap_y, minimap_x * 3, minimap_x * 3 + 3)
+  end
 end
 
 return M
