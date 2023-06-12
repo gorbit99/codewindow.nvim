@@ -101,6 +101,8 @@ end
 
 local function setup_minimap_autocmds(parent_buf, on_switch_window, on_cursor_move)
   augroup = api.nvim_create_augroup('CodewindowAugroup', {})
+
+  if not api.nvim_buf_is_valid(parent_buf or -1) then return end
   api.nvim_create_autocmd({ 'WinScrolled' }, {
     buffer = parent_buf,
     callback = function()
@@ -121,6 +123,8 @@ local function setup_minimap_autocmds(parent_buf, on_switch_window, on_cursor_mo
     end,
     group = augroup,
   })
+
+  if not api.nvim_buf_is_valid(window.buffer or -1) then return end
   api.nvim_create_autocmd({ 'BufWinLeave' }, {
     buffer = window.buffer,
     callback = function()
