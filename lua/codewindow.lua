@@ -4,18 +4,18 @@ local minimap_txt = require('codewindow.text')
 local minimap_win = require('codewindow.window')
 local minimap_hl  = require('codewindow.highlight')
 
-local defer = vim.defer_fn
+local defer = vim.schedule
 local api = vim.api
 
 function M.open_minimap()
   local current_buffer = api.nvim_get_current_buf()
   local window
   window = minimap_win.create_window(current_buffer, function()
-    defer(M.open_minimap, 0)
+    defer(M.open_minimap)
   end, function()
     defer(function()
       minimap_hl.display_cursor(window)
-    end, 0)
+    end)
   end)
 
   if window == nil then
@@ -78,7 +78,7 @@ function M.setup(config)
       end
 
       if should_open then
-        defer(M.open_minimap, 0)
+        defer(M.open_minimap)
       end
     end
   })

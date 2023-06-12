@@ -7,7 +7,7 @@ local config = require('codewindow.config').get()
 local window = nil
 
 local api = vim.api
-local defer = vim.defer_fn
+local defer = vim.schedule
 
 local function center_minimap()
   local topline = utils.get_top_line(window.parent_win)
@@ -46,7 +46,7 @@ local function display_screen_bounds()
         window
       )
       minimap_hl.display_screen_bounds(window)
-    end, 0)
+    end)
   end
 end
 
@@ -110,7 +110,7 @@ local function setup_minimap_autocmds(parent_buf, on_switch_window, on_cursor_mo
         center_minimap()
         display_screen_bounds()
         api.nvim_win_set_config(window.window, get_window_config(window.parent_win))
-      end, 0)
+      end)
     end,
     group = augroup,
   })
@@ -119,7 +119,7 @@ local function setup_minimap_autocmds(parent_buf, on_switch_window, on_cursor_mo
     callback = function()
       defer(function()
         minimap_txt.update_minimap(api.nvim_win_get_buf(window.parent_win), window)
-      end, 0)
+      end)
     end,
     group = augroup,
   })
@@ -136,7 +136,7 @@ local function setup_minimap_autocmds(parent_buf, on_switch_window, on_cursor_mo
         api.nvim_win_set_buf(window.window, window.buffer)
         api.nvim_win_set_buf(window.parent_win, new_buffer)
         M.toggle_focused()
-      end, 0)
+      end)
     end,
     group = augroup,
   })
