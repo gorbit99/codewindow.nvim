@@ -197,6 +197,9 @@ local function should_ignore(current_window)
     return true
   end
 
+  if vim.bo.buftype ~= '' then
+    return true
+  end
   local filetype = vim.bo.filetype
   for _, v in ipairs(config.exclude_filetypes) do
     if v == filetype then
