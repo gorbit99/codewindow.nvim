@@ -6,7 +6,7 @@ local highlighter
 local ts_utils
 
 local hl_namespace
-local underline_namespace
+local screenbounds_namespace
 local diagnostic_namespace
 local cursor_namespace
 
@@ -15,7 +15,7 @@ local highlight_range = vim.highlight.range
 
 function M.setup()
   hl_namespace = api.nvim_create_namespace("codewindow.highlight")
-  underline_namespace = api.nvim_create_namespace("codewindow.underline")
+  screenbounds_namespace = api.nvim_create_namespace("codewindow.screenbounds")
   diagnostic_namespace = api.nvim_create_namespace("codewindow.diagnostic")
   cursor_namespace = api.nvim_create_namespace("codewindow.cursor")
 
@@ -26,11 +26,12 @@ function M.setup()
   api.nvim_set_hl(0, "CodewindowAddition", { fg = "#aadb56", default = true })
   api.nvim_set_hl(0, "CodewindowDeletion", { fg = "#fc4c4c", default = true })
   api.nvim_set_hl(0, "CodewindowUnderline", { underline = true, sp = "#ffffff", default = true })
+  api.nvim_set_hl(0, "CodewindowBoundsBackground", { link = "CursorLine", default = true })
 end
 
 local function create_hl_namespaces(buffer)
   api.nvim_buf_clear_namespace(buffer, hl_namespace, 0, -1)
-  api.nvim_buf_clear_namespace(buffer, underline_namespace, 0, -1)
+  api.nvim_buf_clear_namespace(buffer, screenbounds_namespace, 0, -1)
   api.nvim_buf_clear_namespace(buffer, diagnostic_namespace, 0, -1)
 end
 
@@ -190,10 +191,10 @@ function M.apply_highlight(highlights, buffer, lines)
 end
 
 function M.display_screen_bounds(window)
-  if underline_namespace == nil then
+  if screenbounds_namespace == nil then
     return
   end
-  api.nvim_buf_clear_namespace(window.buffer, underline_namespace, 0, -1)
+  api.nvim_buf_clear_namespace(window.buffer, screenbounds_namespace, 0, -1)
 
   local topline = utils.get_top_line(window.parent_win)
   local botline = utils.get_bot_line(window.parent_win)
@@ -202,32 +203,51 @@ function M.display_screen_bounds(window)
 
   local top_y = math.floor(topline / 4)
 
-  if top_y > 0 then
+  if top_y > 0 and config.screen_bounds == "lines" then
     api.nvim_buf_add_highlight(
       window.buffer,
-      underline_namespace,
+      screenbounds_namespace,
       "CodewindowUnderline",
       top_y - 1,
       6,
       6 + config.minimap_width * 3
     )
   end
+
   local bot_y = top_y + difference - 1
   local buf_height = api.nvim_buf_line_count(window.buffer)
+
   if bot_y > buf_height - 1 then
     bot_y = buf_height - 1
   end
+
   if bot_y < 0 then
     return
   end
-  api.nvim_buf_add_highlight(
-    window.buffer,
-    underline_namespace,
-    "CodewindowUnderline",
-    bot_y,
-    6,
-    6 + config.minimap_width * 3
-  )
+
+  if config.screen_bounds == "lines" then
+    api.nvim_buf_add_highlight(
+      window.buffer,
+      screenbounds_namespace,
+      "CodewindowUnderline",
+      bot_y,
+      6,
+      6 + config.minimap_width * 3
+    )
+  end
+
+  if config.screen_bounds == "background" then
+    for y = top_y, bot_y do
+      api.nvim_buf_add_highlight(
+        window.buffer,
+        screenbounds_namespace,
+        "CodewindowBoundsBackground",
+        y,
+        6,
+        6 + config.minimap_width * 3
+      )
+    end
+  end
 
   local center = math.floor((top_y + bot_y) / 2) + 1
   if api.nvim_win_is_valid(window.window) then

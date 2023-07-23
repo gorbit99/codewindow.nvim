@@ -3,7 +3,7 @@ local M = {}
 local config = {
   active_in_terminals = false,
   auto_enable = false,
-  exclude_filetypes = { 'help' },
+  exclude_filetypes = { "help" },
   max_lines = nil,
   max_minimap_height = nil,
   minimap_width = 20,
@@ -13,9 +13,10 @@ local config = {
   width_multiplier = 4,
   z_index = 1,
   show_cursor = true,
-  window_border = 'single',
-  relative = 'win',
-  events = { 'TextChanged', 'InsertLeave', 'DiagnosticChanged', 'FileWritePost' }
+  screen_bounds = "lines",
+  window_border = "single",
+  relative = "win",
+  events = { "TextChanged", "InsertLeave", "DiagnosticChanged", "FileWritePost" },
 }
 
 function M.get()
