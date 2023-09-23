@@ -60,7 +60,9 @@ end
 local augroup
 
 function M.close_minimap()
-  api.nvim_buf_delete(window.buffer, { force = true });
+  if api.nvim_buf_is_valid(window.buffer) then
+    api.nvim_buf_delete(window.buffer, { force = true });
+  end
   if augroup then
     api.nvim_clear_autocmds({ group = augroup })
   end
