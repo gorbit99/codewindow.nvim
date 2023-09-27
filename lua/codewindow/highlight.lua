@@ -27,6 +27,7 @@ function M.setup()
   api.nvim_set_hl(0, "CodewindowDeletion", { fg = "#fc4c4c", default = true })
   api.nvim_set_hl(0, "CodewindowUnderline", { underline = true, sp = "#ffffff", default = true })
   api.nvim_set_hl(0, "CodewindowBoundsBackground", { link = "CursorLine", default = true })
+  api.nvim_set_hl(0, "CodewindowBoundsForeground", { fg = "#aadb56", default = true })
 end
 
 local function create_hl_namespaces(buffer)
@@ -159,7 +160,11 @@ function M.apply_highlight(highlights, buffer, lines)
               end_x = end_x + 1
               highlights[y][x][pos] = ""
             end
-            api.nvim_buf_add_highlight(buffer, hl_namespace, "@" .. group, y - 1, (x - 1) * 3 + 6, end_x * 3 + 6)
+            api.nvim_buf_set_extmark(buffer, hl_namespace, y - 1, (x - 1) * 3 + 6, {
+              end_col = end_x * 3 + 6,
+              hl_group = "@" .. group,
+              priority = 100,
+            })
           end
         end
       end
@@ -247,6 +252,16 @@ function M.display_screen_bounds(window)
         6 + config.minimap_width * 3
       )
     end
+  end
+
+  if config.screen_bounds == "foreground" then
+    api.nvim_buf_set_extmark(window.buffer, screenbounds_namespace, top_y, 6, {
+      end_row = bot_y,
+      end_col = 6 + config.minimap_width * 3,
+      hl_group = "CodewindowBoundsForeground",
+      hl_eol = true,
+      priority = 200,
+    })
   end
 
   local center = math.floor((top_y + bot_y) / 2) + 1
