@@ -69,6 +69,11 @@ function M.close_minimap()
   window = nil
 end
 
+local function get_editor_height()
+  local editor_height = vim.o.lines - vim.o.cmdheight - vim.o.laststatus
+  return editor_height
+end
+
 local function get_window_height(current_window)
   local window_height = vim.fn.winheight(current_window)
   return window_height
@@ -76,6 +81,9 @@ end
 
 local function get_window_config(current_window)
   local minimap_height = get_window_height(current_window)
+  if config.relative == "editor" then
+    minimap_height = get_editor_height()
+  end
   if config.max_minimap_height then
     minimap_height = math.min(minimap_height, config.max_minimap_height)
   end
