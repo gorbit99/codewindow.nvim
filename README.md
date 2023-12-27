@@ -31,6 +31,19 @@ use {
 }
 ```
 
+Lazy:
+```lua
+{
+  'gorbit99/codewindow.nvim',
+  init = function() 
+    require('codewindow').apply_default_keybinds()
+  end,
+  opts = {
+    -- here you can paste configuration block
+  },
+}
+```
+
 ## Configuration
 
 The setup method accepts an optional table as an argument with the following options (with the defaults):
