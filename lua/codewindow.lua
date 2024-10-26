@@ -57,7 +57,7 @@ function M.setup(config)
 
   minimap_hl.setup()
 
-  api.nvim_create_autocmd({ 'BufEnter', 'WinEnter' }, {
+  api.nvim_create_autocmd({'BufWinEnter'}, {
     callback = function()
       local filetype = vim.bo.filetype
       local should_open = false
@@ -84,6 +84,12 @@ function M.setup(config)
       if should_open then
         defer(M.open_minimap)
       end
+    end
+  })
+
+  api.nvim_create_autocmd({'TabLeave'}, {
+    callback = function()
+        defer(M.close_minimap)
     end
   })
 end
