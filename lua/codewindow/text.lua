@@ -6,6 +6,8 @@ local utils = require('codewindow.utils')
 
 local api = vim.api
 
+local tab2chars = string.rep(" ", vim.opt.tabstop:get())
+
 local function is_whitespace(chr)
   return chr == " " or chr == "\t" or chr == ""
 end
@@ -28,7 +30,7 @@ local function compress_text(lines)
   end
 
   for y = 1, #lines do
-    local current_line = lines[y]
+    local current_line = lines[y]:gsub("\t", tab2chars)
     for x = 1, config.minimap_width * 2 do
 
       local any_printable = false
