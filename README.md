@@ -48,7 +48,7 @@ The setup method accepts an optional table as an argument with the following opt
   width_multiplier = 4, -- How many characters one dot represents
   z_index = 1, -- The z-index the floating window will be on
   show_cursor = true, -- Show the cursor position in the minimap
-  screen_bounds = 'lines' -- How the visible area is displayed, "lines": lines above and below, "background": background color
+  screen_bounds = 'lines' -- How the visible area is displayed, "lines": lines above and below, "background": background color, "foreground": foreground color
   window_border = 'single' -- The border style of the floating window (accepts all usual options)
   relative = 'win' -- What will be the minimap be placed relative to, "win": the current window, "editor": the entire editor
   events = { 'TextChanged', 'InsertLeave', 'DiagnosticChanged', 'FileWritePost' } -- Events that update the code window
@@ -83,6 +83,7 @@ CodewindowAddition -- the color of the addition git sign
 CodewindowDeletion -- the color of the deletion git sign
 CodewindowUnderline -- the color of the underlines on the minimap
 CodewindowBoundsBackground -- the color of the background on the minimap
+CodewindowBoundsForeground -- the color of the foreground on the minimap
 
 -- Example
 vim.api.nvim_set_hl(0, 'CodewindowBorder', {fg = '#ffff00'})
