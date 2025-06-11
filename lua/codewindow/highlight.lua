@@ -11,7 +11,7 @@ local diagnostic_namespace
 local cursor_namespace
 
 local api = vim.api
-local highlight_range = vim.highlight.range
+local highlight_range = vim.hl.range
 
 function M.setup()
   hl_namespace = api.nvim_create_namespace("codewindow.highlight")
